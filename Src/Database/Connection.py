@@ -58,10 +58,11 @@ class FirebirdDB:
         with self.connect() as cursor:
             try:
                 cursor.execute(query)
-                return cursor.fetchall()  # Retorna o resultado da consulta
+                resultado = cursor.fetchall()
+                return resultado
             except Exception as e:
                 self.logger.error(f"Erro ao executar a consulta: {e}")
-                return None
+                return []
 
     def execute_UDI(self, query):
         """Executa uma consulta de inserção, atualização ou exclusão"""

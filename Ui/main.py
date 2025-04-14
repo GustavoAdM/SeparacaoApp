@@ -122,8 +122,8 @@ class Ui_MainWindow(object):
         self.Empresa.setStyleSheet(u"font: 75 10pt \"Arial\";")
         self.Empresa.setReadOnly(True)
         self.TW_ordemservico = QTableWidget(self.centralwidget)
-        if (self.TW_ordemservico.columnCount() < 16):
-            self.TW_ordemservico.setColumnCount(16)
+        if (self.TW_ordemservico.columnCount() < 18):
+            self.TW_ordemservico.setColumnCount(18)
         
           # Ocultar
         self.TW_ordemservico.setColumnHidden(0, True)
@@ -136,6 +136,8 @@ class Ui_MainWindow(object):
         self.TW_ordemservico.setColumnHidden(7, True)
         self.TW_ordemservico.setColumnHidden(8, True)
         self.TW_ordemservico.setColumnHidden(9, True)
+        self.TW_ordemservico.setColumnHidden(16, True)
+        self.TW_ordemservico.setColumnHidden(17, True)
 
         # Tamanho colunas
         self.TW_ordemservico.setColumnWidth(11, 200)
@@ -179,6 +181,10 @@ class Ui_MainWindow(object):
         self.TW_ordemservico.setHorizontalHeaderItem(14, __qtablewidgetitem24)
         __qtablewidgetitem25 = QTableWidgetItem()
         self.TW_ordemservico.setHorizontalHeaderItem(15, __qtablewidgetitem25)
+        __qtablewidgetitem26 = QTableWidgetItem()
+        self.TW_ordemservico.setHorizontalHeaderItem(16, __qtablewidgetitem26)
+        __qtablewidgetitem27 = QTableWidgetItem()
+        self.TW_ordemservico.setHorizontalHeaderItem(17, __qtablewidgetitem27)
         self.TW_ordemservico.setObjectName(u"TW_ordemservico")
         self.TW_ordemservico.setGeometry(QRect(11, 370, 1091, 310))
         self.TW_ordemservico.setStyleSheet(u"font: 75 10pt \"Arial\";")
@@ -204,7 +210,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"SeparacaoApp", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"SearacaoApp", None))
         ___qtablewidgetitem = self.ListaPedido.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Tipo", None));
         ___qtablewidgetitem1 = self.ListaPedido.horizontalHeaderItem(1)
@@ -255,7 +261,7 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem19 = self.TW_ordemservico.horizontalHeaderItem(9)
         ___qtablewidgetitem19.setText(QCoreApplication.translate("MainWindow", u"Marca", None));
         ___qtablewidgetitem20 = self.TW_ordemservico.horizontalHeaderItem(10)
-        ___qtablewidgetitem20.setText(QCoreApplication.translate("MainWindow", u"Or\u00e7amento", None));
+        ___qtablewidgetitem20.setText(QCoreApplication.translate("MainWindow", u"O/S", None));
         ___qtablewidgetitem21 = self.TW_ordemservico.horizontalHeaderItem(11)
         ___qtablewidgetitem21.setText(QCoreApplication.translate("MainWindow", u"Cliente", None));
         ___qtablewidgetitem22 = self.TW_ordemservico.horizontalHeaderItem(12)
@@ -266,5 +272,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem24.setText(QCoreApplication.translate("MainWindow", u"Quant.", None));
         ___qtablewidgetitem25 = self.TW_ordemservico.horizontalHeaderItem(15)
         ___qtablewidgetitem25.setText(QCoreApplication.translate("MainWindow", u"Separador", None));
+        ___qtablewidgetitem26 = self.TW_ordemservico.horizontalHeaderItem(16)
+        ___qtablewidgetitem26.setText(QCoreApplication.translate("MainWindow", u"ID", None));
+        ___qtablewidgetitem27 = self.TW_ordemservico.horizontalHeaderItem(17)
+        ___qtablewidgetitem27.setText(QCoreApplication.translate("MainWindow", u"Cod Forn", None));
     # retranslateUi
 

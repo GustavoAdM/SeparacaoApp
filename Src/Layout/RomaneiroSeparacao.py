@@ -37,7 +37,8 @@ class RomaneioSeparacao:
         self.c.drawString(1 * mm, self.comprimento  - 21 * mm, "_"*50)
         self.c.drawString(6 * mm, self.comprimento - 25 * mm, "OS")
         self.c.drawString(15 * mm, self.comprimento - 25 * mm, "Vendedor")
-        self.c.drawString(55 * mm, self.comprimento - 25 * mm, "Marca")
+        self.c.drawString(38 * mm, self.comprimento - 25 * mm, "Cod Fornecedor")
+        self.c.drawString(65 * mm, self.comprimento - 25 * mm, "Marca")
         self.c.drawString(6 * mm, self.comprimento - 30 * mm, "Cod")
         self.c.drawString(15 * mm, self.comprimento - 30 * mm, "Desc")
         self.c.drawString(55 * mm, self.comprimento - 30 * mm, "Qnt.")
@@ -60,13 +61,14 @@ class RomaneioSeparacao:
 
             # Adicionar o item
             self.c.drawString(7 * mm, self.y_atual - 1, item[1]) #  Os
-            self.c.drawString(16 * mm, self.y_atual - 1, str(item[6])[:15]) # Vendedor
-            self.c.drawString(55 * mm, self.y_atual - 1, str(item[9])[:10]) # Marca
+            self.c.drawString(16 * mm, self.y_atual - 1, str(item[7])[:10]) # Vendedor
+            self.c.drawString(38 * mm, self.y_atual - 1, item[11]) # FORNECDOR
+            self.c.drawString(65 * mm, self.y_atual - 1, str(item[10])[:10]) # Marca
             self.c.drawString(7 * mm, self.y_atual - 15, item[2]) # Cod Item
-            self.c.drawString(18 * mm, self.y_atual - 15, str(item[4])[:22]) # Desc Item
-            self.c.drawString(55 * mm, self.y_atual - 15, item[7]) # Qntidade
-            self.c.drawString(58 * mm, self.y_atual - 15, item[8]) # unidade
-            self.c.drawString(65 * mm, self.y_atual - 15, item[5]) # Local de estoque
+            self.c.drawString(18 * mm, self.y_atual - 15, str(item[5])[:22]) # Desc Item
+            self.c.drawString(55 * mm, self.y_atual - 15, item[8]) # Qntidade
+            self.c.drawString(58 * mm, self.y_atual - 15, item[9]) # unidade
+            self.c.drawString(65 * mm, self.y_atual - 15, item[6]) # Local de estoque
             self.c.drawString(1 * mm, self.y_atual - 25, f"-"*110)
 
             self.y_atual -= self.altura_linha  # Move para a próxima linha

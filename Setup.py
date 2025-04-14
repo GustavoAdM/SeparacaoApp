@@ -2,8 +2,8 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 from PySide6.QtCore import QModelIndex, Qt, QTimer, QThread, Signal
 from Ui.main import Ui_MainWindow
-from Src.Database.Queries import (pedidos_nao_separados, inserir_inicio, cancelar, 
-                                  finalizar, orcamentos_separacao, inserir_orcamento, 
+from Src.Database.Queries import (pedidos_nao_separados, inserir_inicio, cancelar,
+                                  finalizar, orcamentos_separacao, inserir_orcamento,
                                   cacelar_orcamento, finalizar_orcamento)
 from Src.Layout.RomaneiroSeparacao import RomaneioSeparacao
 from Src.Utils.ElgineLabelPrinter import ElginLabelPrinter
@@ -28,15 +28,16 @@ class WorkerThread(QThread):
                 data = pedidos_nao_separados(empresa=self.empresa)
             elif self.tabela == "O":
                 data = orcamentos_separacao(cd_empresa=self.empresa)
-            
+
             # Emite o sinal com os dados quando terminar
             self.data_ready.emit(data, self.tabela)
         except Exception as e:
             self.data_ready.emit([], "erro")
             print(f"Erro no WorkerThread: {e}")
 
+
 class MainWindow(QMainWindow):
-    # Definir constantes 
+    # Definir constantes
     USUARIO_KEY = 'usuario'
     EMPRESA_KEY = 'empresa'
 
@@ -65,7 +66,8 @@ class MainWindow(QMainWindow):
         self.ui.finalizar.clicked.connect(self.finalizar)
 
         # Gatilhos de eventos Orçamento
-        self.ui.TW_ordemservico.selectionModel().selectionChanged.connect(self.get_value_orcamento)
+        self.ui.TW_ordemservico.selectionModel(
+        ).selectionChanged.connect(self.get_value_orcamento)
 
         # Variáveis de controle
         self.pedido = []
@@ -74,10 +76,10 @@ class MainWindow(QMainWindow):
         self.tipo_tabela = ""
         self.limpar_pedidos = False
 
-        # Timer para atualizar a tabela a cada 5 segundos
+        # Timer para atualizar a tabela a cada 10 segundos
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.add_data_to_table)
-        self.timer.start(5000)
+        self.timer.start(10000)
 
     def load_config(self):
         """Carrega as configurações do arquivo INI."""
@@ -91,7 +93,7 @@ class MainWindow(QMainWindow):
 
     def on_click_table(self, index: QModelIndex):
         """Gatilho quando um item de qualquer tabela é clicado."""
-        try: 
+        try:
             self.limpar_pedidos = True
             self.ui.TW_ordemservico.clearSelection()
 
@@ -139,20 +141,25 @@ class MainWindow(QMainWindow):
         """Inicia o pedido com a informação do usuário e pedido selecionados."""
         try:
             if not self.usuario:
-                self.info_error("Campo usuário obrigatório. Por favor, preencha o campo usuário antes de continuar.")
+                self.info_error(
+                    "Campo usuário obrigatório. Por favor, preencha o campo usuário antes de continuar.")
                 return
 
             if not self.pedido:
-                self.info_error("Por favor, selecione um pedido para continuar.")
+                self.info_error(
+                    "Por favor, selecione um pedido para continuar.")
 
             if self.tipo_tabela == "P":
-                inserir_inicio(empresa=self.empresa, pedido=self.pedido[0], status='I', usuario=self.usuario) 
+                inserir_inicio(
+                    empresa=self.empresa, pedido=self.pedido[0], status='I', usuario=self.usuario)
             elif self.tipo_tabela == "O":
-                for pedidos_info in self.pedido:
-                    if pedidos_info[3] == "N" or pedidos_info[3] == "P":
-                        inserir_orcamento(cd_empresa=pedidos_info[0], nr_orcamento=pedidos_info[1], cd_item=pedidos_info[2], separador=self.usuario)
-                self.gerar_romaneio()
+                for empresa, orcamento, item, status, id, *_ in self.pedido:
+                    if status == "N":
+                        inserir_orcamento(
+                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=id)
                 self.ui.TW_ordemservico.clearSelection()
+                self.gerar_romaneio()
+                
 
             self.add_data_to_table()
             self.mostrar_encerrar()
@@ -169,9 +176,10 @@ class MainWindow(QMainWindow):
             if self.tipo_tabela == "P":
                 cancelar(empresa=self.empresa, pedido=self.pedido[0])
             elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, desc_item, locais, vendedor, quantidade, unidade, marca in self.pedido:
-                    if status == "I" or status == "P":
-                        cacelar_orcamento(cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario)
+                for empresa, orcamento, item, status, id, *_ in self.pedido:
+                    if status == "I":
+                        cacelar_orcamento(
+                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=id)
                 self.ui.TW_ordemservico.clearSelection()
 
             self.add_data_to_table()
@@ -189,11 +197,13 @@ class MainWindow(QMainWindow):
             if self.tipo_tabela == "P":
                 finalizar(empresa=self.empresa, pedido=self.pedido[0])
             elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, desc_item, locais, vendedor, quantidade, unidade, marca in self.pedido:
-                    if status == "I" or status == "P":
-                        finalizar_orcamento(cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario)
+                for empresa, orcamento, item, status, id, *_ in self.pedido:
+                    if status == "I":
+                        finalizar_orcamento(
+                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=id)
+
                 self.ui.TW_ordemservico.clearSelection()
-        
+
             self.add_data_to_table()
             self.mostrar_iniciar()
         except Exception as e:
@@ -208,7 +218,7 @@ class MainWindow(QMainWindow):
         try:
             self.tipo_tabela = "P"
             nr_pedido_index = self.ui.ListaPedido.model().index(row, 4)
-            return [self.ui.ListaPedido.model().data(nr_pedido_index)]        
+            return [self.ui.ListaPedido.model().data(nr_pedido_index)]
         except Exception as e:
             self.info_error(f"Erro ao obter número do pedido: {e}")
             return None
@@ -240,7 +250,7 @@ class MainWindow(QMainWindow):
 
         # Para cada linha desmarcada, removemos o código da lista
         self.ui.ListaPedido.clearSelection()
-        
+
         # Desabilitar atualizações para evitar redraws frequentes
         self.ui.TW_ordemservico.setUpdatesEnabled(False)
 
@@ -258,10 +268,12 @@ class MainWindow(QMainWindow):
             nr_orcamento = self.ui.TW_ordemservico.item(row, 10).text()
             vendedor = self.ui.TW_ordemservico.item(row, 12).text()
             quantidade = self.ui.TW_ordemservico.item(row, 14).text()
-
+            cd_fornecedor = self.ui.TW_ordemservico.item(row, 17).text()
+            id = self.ui.TW_ordemservico.item(row, 16).text()
 
             # Cria uma tupla com as informações relevantes
-            pedido = (cod_empres, nr_orcamento, cod_item, status, desc_item, locais, vendedor, quantidade, unidade, marca)
+            pedido = (cod_empres, nr_orcamento, cod_item, status, id, desc_item,
+                      locais, vendedor, quantidade, unidade, marca, cd_fornecedor)
 
             # Verifica se o pedido está na lista de pedidos e remove
             if pedido in self.pedido:
@@ -289,10 +301,12 @@ class MainWindow(QMainWindow):
             nr_orcamento = self.ui.TW_ordemservico.item(row, 10).text()
             vendedor = self.ui.TW_ordemservico.item(row, 12).text()
             quantidade = self.ui.TW_ordemservico.item(row, 14).text()
-            
-            
+            cd_fornecedor = self.ui.TW_ordemservico.item(row, 17).text()
+            id = self.ui.TW_ordemservico.item(row, 16).text()
+
             # Cria uma tupla com as informações relevantes
-            pedido = (cod_empres, nr_orcamento, cod_item, status, desc_item, locais, vendedor, quantidade, unidade, marca)
+            pedido = (cod_empres, nr_orcamento, cod_item, status, id, desc_item,
+                      locais, vendedor, quantidade, unidade, marca, cd_fornecedor)
 
             # Adiciona à lista se o pedido não estiver presente
             if pedido not in self.pedido:
@@ -316,7 +330,6 @@ class MainWindow(QMainWindow):
     def click_tabela_orcamento(self):
         self.pedido.clear()
 
-
     def add_data_to_table(self):
         """Atualiza os dados da tabela com os pedidos não separados."""
         try:
@@ -330,7 +343,8 @@ class MainWindow(QMainWindow):
 
             # Para orçamentos
             self.worker_orcamento = WorkerThread(codigoempresa, "O", self)
-            self.worker_orcamento.data_ready.connect(self.update_table_from_thread)
+            self.worker_orcamento.data_ready.connect(
+                self.update_table_from_thread)
             self.worker_orcamento.start()
 
         except Exception as e:
@@ -347,21 +361,26 @@ class MainWindow(QMainWindow):
         """Atualiza uma tabela com os dados fornecidos."""
         try:
             table_widget.setRowCount(len(data))
-            table_widget.setUpdatesEnabled(False)  # Desabilita atualizações visuais
+            # Desabilita atualizações visuais
+            table_widget.setUpdatesEnabled(False)
 
             for row_idx, row_data in enumerate(data):
                 for col_idx, item in enumerate(row_data):
-                    item = item.isoformat() if isinstance(item, (datetime.date, datetime.datetime)) else str(item)
+                    item = item.isoformat() if isinstance(
+                        item, (datetime.date, datetime.datetime)) else str(item)
                     cell = QTableWidgetItem(item)
                     if tabela == "P":
-                        alignment = Qt.AlignLeft | Qt.AlignVCenter if col_idx in {5, 6} else Qt.AlignCenter
+                        alignment = Qt.AlignLeft | Qt.AlignVCenter if col_idx in {
+                            5, 6} else Qt.AlignCenter
                     elif tabela == "O":
-                        alignment = Qt.AlignLeft | Qt.AlignVCenter if col_idx in {11, 12, 13} else Qt.AlignCenter
+                        alignment = Qt.AlignLeft | Qt.AlignVCenter if col_idx in {
+                            11, 12, 13} else Qt.AlignCenter
                     cell.setTextAlignment(alignment)
                     cell.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     table_widget.setItem(row_idx, col_idx, cell)
 
-            table_widget.setUpdatesEnabled(True)  # Reabilita atualizações visuais
+            # Reabilita atualizações visuais
+            table_widget.setUpdatesEnabled(True)
 
         except Exception as e:
             self.info_error(f"Erro ao atualizar a tabela: {e}")
@@ -376,10 +395,11 @@ class MainWindow(QMainWindow):
 
         try:
             printer = ElginLabelPrinter('Config\\Config.ini')
-            #printer.listar_impressoras()
+            # printer.listar_impressoras()
             printer.imprimir_relatorio(nome_arquivo=nome_arquivo)
         except Exception as e:
             print(f"Erro: {e}")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

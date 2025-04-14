@@ -40,7 +40,7 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Core,Gui,Widgets
+modules = Core,Widgets,Gui
 
 # qt plugins used by the application
 plugins = imageformats,platforms/darwin,xcbglintegrations,accessiblebridge,generic,platformthemes,egldeviceintegrations,iconengines,platforms,styles,platforminputcontexts
@@ -67,7 +67,7 @@ macos.permissions =
 mode = onefile
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest
+extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest --file-version=1.0.0 --product-version=1.0.0
 
 [buildozer]
 

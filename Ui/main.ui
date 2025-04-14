@@ -46,22 +46,27 @@
     </property>
     <column>
      <property name="text">
-      <string>Tipo</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Status</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Empresa</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
       <string>Urgencia</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Data</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Hora</string>
      </property>
      <property name="font">
       <font>
@@ -110,32 +115,27 @@
     </column>
     <column>
      <property name="text">
-      <string>Data</string>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Hora</string>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-    </column>
-    <column>
-     <property name="text">
       <string>Separador</string>
      </property>
      <property name="font">
       <font>
        <pointsize>10</pointsize>
       </font>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Tipo</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Status</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Empresa</string>
      </property>
     </column>
    </widget>
@@ -414,6 +414,16 @@ font: 75 12pt &quot;Arial&quot;;</string>
     <column>
      <property name="text">
       <string>Separador</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>ID</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Cod Forn</string>
      </property>
     </column>
    </widget>
