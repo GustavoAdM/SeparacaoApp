@@ -32,3 +32,6 @@ Este aplicativo é ideal para ambientes que exigem agilidade e precisão na sepa
 - Integração completa com sistemas de impressão e banco de dados.
 
 Transforme a forma de gerenciar a separação de itens com uma solução que alia tecnologia avançada e usabilidade.
+
+
+OBS: Necessario descompactar o Reader.rar para a pasta raiz.
