@@ -1,78 +1,68 @@
+from sqlalchemy import create_engine, text
+from sqlalchemy.pool import QueuePool
 import configparser
 import logging
-from firebird.driver import driver_config, connect
-from contextlib import contextmanager
 
 class FirebirdDB:
-    def __init__(self, config_file='Config\\Config.ini'):
-        # Leitura do arquivo de configuração
+    def __init__(self, config_file='Config/Config.ini'):
+        # Lê o arquivo de configuração INI
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
 
-        # Atribuindo os parâmetros de configuração
-        self.usuario = self.config.get('database', 'usuario', fallback=None)
-        self.senha = self.config.get('database', 'senha', fallback=None)
-        self.ip = self.config.get('database', 'ip', fallback=None)
-        self.caminho = self.config.get('database', 'caminho', fallback=None)
-        self.porta = self.config.getint('database', 'porta', fallback=3050)  # Alterado para inteiro
-        self.lib_path = self.config.get('database', 'lib_path', fallback=None)
+        # Carrega os parâmetros de conexão
+        usuario = self.config.get('database', 'usuario')
+        senha = self.config.get('database', 'senha')
+        ip = self.config.get('database', 'ip')
+        porta = self.config.get('database', 'porta', fallback='3050')
+        caminho = self.config.get('database', 'caminho')
 
-        #Configurando conexão do Firebird
-        driver_config.server_defaults.host.value = str(self.ip)
-        driver_config.server_defaults.port.value = str(self.porta)
-        driver_config.server_defaults.user.value = str(self.usuario)
-        driver_config.server_defaults.password.value = str(self.senha)
-        driver_config.fb_client_library.value = self.lib_path
+        # Monta a URL de conexão compatível com SQLAlchemy
+        self.db_url = f"firebird+fdb://{usuario}:{senha}@{ip}:{porta}/{caminho}"
 
-        # Configuração do logging
+        # Cria o engine com um pool de conexões
+        self.engine = create_engine(
+            self.db_url,
+            poolclass=QueuePool,   # Usa um pool do tipo fila (queue)
+            pool_size=10,          # Número fixo de conexões mantidas abertas
+            max_overflow=5,        # Conexões extras temporárias além do pool
+            pool_timeout=30,       # Tempo máximo (segundos) para aguardar conexão livre
+            pool_recycle=1800,     # Recicla conexões após 30 minutos (evita timeout de rede)
+            echo=False             # Altere para True se quiser logar SQL no terminal
+        )
+
+        # Configura o logger para capturar erros e mensagens
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-        # Verifica se as configurações necessárias estão presentes
-        self._validate_config()
-
-    def _validate_config(self):
-        """Valida se todas as configurações necessárias estão presentes"""
-        if not all([self.usuario, self.senha, self.ip, self.caminho]):
-            raise ValueError("Parâmetros de conexão incompletos no arquivo de configuração.")
-
-    @contextmanager
-    def connect(self):
-        """Context manager para gerenciar a conexão"""
-        connection = None
-        cursor = None
+    def execute_queries(self, query, params=None):
+        """
+        Executa uma consulta SELECT.
+        :param query: string SQL com ou sem parâmetros (use :nome)
+        :param params: dicionário com os parâmetros da query (opcional)
+        :return: lista de dicionários com os resultados
+        """
         try:
-            connection = connect(self.caminho)
-            cursor = connection.cursor()  # Obtemos o cursor a partir da conexão
-            yield cursor
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), params or {})
+                return [dict(row) for row in result]
         except Exception as e:
-            self.logger.error(f"Erro ao conectar ao banco de dados: {e}")
-            raise
-        finally:
-            if connection:
-                connection.close()
-                #self.logger.info("Conexão encerrada.")  # Isso pode ser descomentado para registrar o fechamento
+            self.logger.error(f"Erro na consulta: {e}")
+            return []
 
-    def execute_queries(self, query):
-        """Executa uma consulta SELECT e retorna os resultados"""
-        with self.connect() as cursor:
-            try:
-                cursor.execute(query)
-                resultado = cursor.fetchall()
-                return resultado
-            except Exception as e:
-                self.logger.error(f"Erro ao executar a consulta: {e}")
-                return []
+    def execute_udi(self, query, params=None):
+        """
+        Executa comandos INSERT, UPDATE ou DELETE.
+        :param query: string SQL (com ou sem parâmetros)
+        :param params: dicionário com os parâmetros da query (opcional)
+        :return: None
+        """
+        try:
+            # begin() inicia uma transação automática com commit no final
+            with self.engine.begin() as conn:
+                conn.execute(text(query), params or {})
+        except Exception as e:
+            self.logger.error(f"Erro na execução de UDI: {e}")
+            raise  # Relevanta o erro para permitir tratamento externo, se necessário
 
-    def execute_UDI(self, query):
-        """Executa uma consulta de inserção, atualização ou exclusão"""
-        with self.connect() as cursor:
-            try:
-                cursor.execute(query)
-                cursor.connection.commit()  # Confirma a transação usando o commit da conexão
-            except Exception as e:
-                self.logger.error(f"Erro ao executar a consulta de UDI: {e}")
-                cursor.connection.rollback()  # Faz rollback caso ocorra erro
 
-# Exemplo de uso
 db = FirebirdDB()

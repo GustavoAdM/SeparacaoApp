@@ -1,64 +1,286 @@
 from .Connection import db
 
-def pedidos_nao_separados(empresa:str = '50'):
-    _querie = f"""
+def pedidos_nao_separados(empresas: list[int] = [50]):
+    _query = """
+        WITH PEDIDOS_SEPARACAO AS (
+            SELECT
+                'P' TIPO_TABLE,
+                COALESCE(ES.STATUS, 'N') STATUS,
+                P.CD_EMPRESA,
+                CASE P.CD_TIPOPEDIDO
+                    WHEN 1 THEN 'BALCÃO'
+                    WHEN 2 THEN 'MOTOBOY'
+                    WHEN 3 THEN 'DESPACHE'
+                    ELSE 'NENHUM'
+                 END NIVEL,
+                P.NR_PEDIDO, PE.NM_PESSOA, PV.NM_PESSOA NM_VENDEDOR,
+                P.DT_PEDIDO, P.HR_PEDIDO,
+                COALESCE(ES.NM_USUARIO, '') SEPARADOR
+            FROM PEDIDO P
+                LEFT JOIN ITEMCONFERENCIAPEDIDO ICP ON (
+                    ICP.CD_EMPRESA = P.CD_EMPRESA
+                    AND ICP.NR_PEDIDO = P.NR_PEDIDO
+                    AND ICP.TP_PEDIDO = P.TP_PEDIDO)
+                LEFT JOIN EXTEND_SEPARACAO ES ON (
+                    ES.CD_EMPRESA = P.CD_EMPRESA
+                    AND ES.NR_PEDIDO = P.NR_PEDIDO)
+                INNER JOIN PESSOA PE ON (PE.CD_PESSOA = P.CD_PESSOA)
+                INNER JOIN PESSOA PV ON (PV.CD_PESSOA = P.CD_VENDEDOR)
+            WHERE
+                P.TP_PEDIDO = 'S'
+                AND P.DT_PEDIDO = CURRENT_DATE
+                AND P.CD_EMPRESA IN :empresas
+                AND ICP.NR_PEDIDO IS NULL
+                AND P.ST_PEDIDO NOT IN ('A', 'P', 'C')
+                AND P.CD_TIPOPEDIDO IS NOT NULL
+                AND P.NR_ORDEMSERVICO IS NULL
+            ORDER BY COALESCE(P.CD_TIPOPEDIDO, 4)
+        )
+        SELECT
+            TIPO_TABLE, STATUS, CD_EMPRESA,
+            NIVEL, NR_PEDIDO, NM_PESSOA,
+            NM_VENDEDOR, DT_PEDIDO, HR_PEDIDO,
+            SEPARADOR
+        FROM PEDIDOS_SEPARACAO PE
+        WHERE PE.STATUS <> 'F'
+    """
+    # Executa passando lista como parâmetro
+    resultado = db.execute_queries(_query, params={"empresas": empresas})
+    return resultado
+
+
+def inserir_inicio(empresa: int, pedido: int, status: str, usuario: str):
+    """Insere início da separação com status e usuário"""
+    _query = """
+        INSERT INTO EXTEND_SEPARACAO (
+            CD_EMPRESA, NR_PEDIDO, NM_USUARIO, STATUS, DT_INICIO, DT_FIM
+        ) VALUES (
+            :empresa, :pedido, :usuario, :status, CURRENT_TIMESTAMP, NULL
+        )
+    """
+    db.execute_udi(query=_query, params={
+        "empresa": empresa,
+        "pedido": pedido,
+        "usuario": usuario,
+        "status": status
+    })
+
+
+def cancelar(empresa: int, pedido: int):
+    """Cancela uma separação (deleta o registro)"""
+    _query = """
+        DELETE FROM EXTEND_SEPARACAO
+        WHERE CD_EMPRESA = :empresa AND NR_PEDIDO = :pedido
+    """
+    db.execute_udi(query=_query, params={
+        "empresa": empresa,
+        "pedido": pedido
+    })
+
+
+def finalizar(empresa: int, pedido: int):
+    """Finaliza a separação atualizando status e data de fim"""
+    _query = """
+        UPDATE EXTEND_SEPARACAO
+        SET STATUS = 'F', DT_FIM = CURRENT_TIMESTAMP
+        WHERE CD_EMPRESA = :empresa AND NR_PEDIDO = :pedido
+    """
+    db.execute_udi(query=_query, params={
+        "empresa": empresa,
+        "pedido": pedido
+    })
+
+
+def orcamentos_separacao(empresas: int = 50):
+
+    _query = """
     SELECT
-        E.TIPO_TABLE, E.STATUS, E.CD_EMPRESA, E.NIVEL,
-        E.NR_PEDIDO, E.NM_PESSOA, E.NM_VENDEDOR,
-        E.DT_PEDIDO, E.HR_PEDIDO, E.SEPARADOR
-    FROM EXTEND_PEDIDO_SEPARACAO({empresa}) E
-    """
-    return db.execute_queries(query=_querie)
-
-def inserir_inicio(empresa, pedido, status, usuario):
-    _querie = f"""
-    INSERT INTO EXTEND_SEPARACAO (CD_EMPRESA, NR_PEDIDO, NM_USUARIO, STATUS, DT_INICIO, DT_FIM)
-                      VALUES ({empresa}, {pedido}, '{usuario}', '{status}', CURRENT_TIMESTAMP, NULL);
-    """
-    db.execute_UDI(query=_querie)
-
-def cancelar(empresa, pedido):
-    _querie = f"""
-    DELETE FROM extend_separacao E
-    WHERE E.cd_empresa = {empresa}
-        AND e.nr_pedido = {pedido}
-    """
-    db.execute_UDI(query=_querie)
-
-def finalizar(empresa, pedido):
-    _querie = f"""
-    UPDATE EXTEND_SEPARACAO SET 
-        STATUS = 'F',
-        DT_FIM = CURRENT_TIMESTAMP
-    WHERE (CD_EMPRESA = {empresa}) AND
-        (NR_PEDIDO = {pedido});
-    """
-    db.execute_UDI(query=_querie)
-
-def orcamentos_separacao(cd_empresa):
-
-    _querie = f"""
-    SELECT  
-        E.TIPO_TABLE, E.STATUS, E.CD_EMPRESA, E.CD_ITEM, E.DESCR, 
-        E.LOCALS, E.CD_PESSOA, E.CD_VENDEDOR,
-        E.SG_UNIDMED, E.DS_MARCA, E.NR_ORDEMSERVICO, E.NM_CLIENTE, 
-        E.NM_VENDEDOR, E.DS_ITEM, E.QNT, E.NM_SEPARADOR, E.ID,
-        COALESCE(E.CD_FORNECEDOR1, ' ') CD_FORNECEDOR1
-    FROM EXTEND_ORDEMSERVICO_SEPARACAO({cd_empresa}) E
+        TIPO_TABLE, STATUS, CD_EMPRESA, CD_ITEM,
+        DESCR, LOCALS, CD_PESSOA, CD_VENDEDOR, SG_UNIDMED,
+        DS_MARCA, NR_ORDEMSERVICO, NM_CLIENTE, NM_VENDEDOR,
+        DS_ITEM, QNT, NM_SEPARADOR, ID, CD_FORNECEDOR1
+        FROM (
+            WITH SERVICOCALCULADO AS (
+                SELECT
+                    SI.CD_EMPRESA,
+                    SI.NR_ORDEMSERVICO,
+                    SI.CD_ITEM,
+                    MAX(COALESCE(SI.PS_SERVICOITEM, SI.QT_SERVICOITEM)) AS QT_SOLICITADA,
+                    SUM(COALESCE(EO.PS_PEDIDO, EO.QT_PEDIDA, 0)) AS QT_PEDIDA_E
+                FROM SERVICOITEM SI
+                LEFT JOIN EXTEND_ORDERMSERVICO EO 
+                    ON EO.CD_EMPRESA = SI.CD_EMPRESA 
+                    AND EO.NR_ORDERMSERVICO = SI.NR_ORDEMSERVICO 
+                    AND EO.CD_ITEM = SI.CD_ITEM
+                WHERE SI.DT_REGISTRO BETWEEN CURRENT_TIMESTAMP-2 AND CURRENT_TIMESTAMP+1
+                    AND SI.CD_EMPRESA = :empresas
+                GROUP BY SI.CD_EMPRESA, SI.NR_ORDEMSERVICO, SI.CD_ITEM
+                HAVING MAX(COALESCE(SI.PS_SERVICOITEM, SI.QT_SERVICOITEM)) >= SUM(COALESCE(EO.PS_PEDIDO, EO.QT_PEDIDA, 0))
+            )
+            SELECT
+                'O' TIPO_TABLE,
+                COALESCE(EO.STATUS, 'N') STATUS,
+                OS.CD_EMPRESA, SI.CD_ITEM, I.DS_ITEM DESCR, LIST(LE.DS_LOCAL, ',') LOCALS,
+                OS.CD_PESSOA, SI.CD_VENDEDOR, I.SG_UNIDMED, M.DS_MARCA,
+                OS.NR_ORDEMSERVICO, PC.NM_PESSOA NM_CLIENTE,
+                PV.NM_PESSOA NM_VENDEDOR,
+                SI.CD_ITEM||' - '||I.DS_ITEM||' ('||LIST(LE.DS_LOCAL, ', ')||')' DS_ITEM,
+                CAST(COALESCE(EO.PS_PEDIDO, EO.QT_PEDIDA, SI.PS_SERVICOITEM, SI.QT_SERVICOITEM)AS NUMERIC(15, 2)) QNT,
+                COALESCE(EO.NM_SEPARADOR, '') NM_SEPARADOR,
+                COALESCE(EO.ID, 1) ID, I.CD_FORNECEDOR1
+            FROM ORDEMSERVICO OS
+            INNER JOIN SERVICOITEM SI ON (SI.CD_EMPRESA = OS.CD_EMPRESA
+                AND SI.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO)
+            INNER JOIN PESSOA PC ON (PC.CD_PESSOA = OS.CD_PESSOA)
+            INNER JOIN PESSOA PV ON (PV.CD_PESSOA = SI.CD_VENDEDOR)
+            INNER JOIN ITEM I ON (I.CD_ITEM = SI.CD_ITEM)
+            INNER JOIN ITEMLOCAL IL ON (IL.CD_ITEM = I.CD_ITEM
+                AND IL.CD_TIPOLOCAL = CASE :empresas
+                                        WHEN 7 THEN 7
+                                        WHEN 40 THEN 1
+                                        WHEN 50 THEN 2
+                                        WHEN 60 THEN 3
+                                        END)
+            INNER JOIN LOCALESTOQUE LE ON (LE.CD_TIPOLOCAL = IL.CD_TIPOLOCAL
+                AND LE.CD_LOCAL = IL.CD_LOCAL)
+            LEFT JOIN EXTEND_ORDERMSERVICO EO ON (EO.CD_EMPRESA = SI.CD_EMPRESA
+                AND EO.NR_ORDERMSERVICO = SI.NR_ORDEMSERVICO
+                AND EO.CD_ITEM = SI.CD_ITEM)
+            LEFT JOIN ITEMCONFERENCIAORDEM ICO ON (ICO.CD_EMPRESA = OS.CD_EMPRESA
+                AND ICO.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO
+                AND ICO.CD_ITEM = SI.CD_ITEM)
+            INNER JOIN MARCA M ON (M.CD_MARCA = I.CD_MARCA)
+            LEFT JOIN ITEMREQUISICAOOFICINA IRQ ON (IRQ.CD_EMPRESAOS = OS.CD_EMPRESA
+                    AND IRQ.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO
+                    AND IRQ.CD_ITEM = SI.CD_ITEM)
+            WHERE OS.ST_ORDEMSERVICO = 'A'
+                AND OS.CD_EMPRESA = :empresas
+                AND ICO.NR_ORDEMSERVICO IS NULL
+                AND COALESCE(EO.STATUS, 'I') NOT IN ('F')
+                AND OS.DT_EMISSAO >= CURRENT_DATE - 30
+                AND IRQ.CD_EMPRESA IS NULL
+            GROUP BY
+                TIPO_TABLE, STATUS, CD_EMPRESA,
+                CD_ITEM, CD_PESSOA, CD_VENDEDOR,
+                NR_ORDEMSERVICO, NM_CLIENTE, NM_VENDEDOR, I.CD_FORNECEDOR1,
+                SI.CD_ITEM,I.DS_ITEM, QNT, NM_SEPARADOR, ID, M.DS_MARCA, I.SG_UNIDMED
+            
+            UNION ALL
+            
+            SELECT
+                'O' AS TIPO_TABLE,
+                'N' AS STATUS,
+                OS.CD_EMPRESA,
+                SI.CD_ITEM,
+                I.DS_ITEM AS DESCR,
+                LIST(LE.DS_LOCAL, ', ') AS LOCALS,
+                OS.CD_PESSOA,
+                SI.CD_VENDEDOR,
+                I.SG_UNIDMED,
+                M.DS_MARCA,
+                OS.NR_ORDEMSERVICO,
+                PC.NM_PESSOA AS NM_CLIENTE,
+                PV.NM_PESSOA AS NM_VENDEDOR,
+                SI.CD_ITEM || ' - ' || I.DS_ITEM || ' (' || LIST(LE.DS_LOCAL, ', ') || ')' AS DS_ITEM,
+                CAST(QT_SOLICITADA - QT_PEDIDA_E AS NUMERIC(15, 2)) AS QNT,
+                '' AS NM_SEPARADOR,
+                MAX(COALESCE(EO.ID, 0)) + 1 ID,
+                I.CD_FORNECEDOR1
+            FROM ORDEMSERVICO OS
+            INNER JOIN SERVICOITEM SI 
+                ON SI.CD_EMPRESA = OS.CD_EMPRESA 
+                AND SI.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO
+            INNER JOIN PESSOA PC ON PC.CD_PESSOA = OS.CD_PESSOA
+            INNER JOIN PESSOA PV ON PV.CD_PESSOA = SI.CD_VENDEDOR
+            INNER JOIN ITEM I ON I.CD_ITEM = SI.CD_ITEM
+            INNER JOIN ITEMLOCAL IL 
+                ON IL.CD_ITEM = I.CD_ITEM
+                AND IL.CD_TIPOLOCAL = CASE :empresas
+                                        WHEN 7 THEN 7
+                                        WHEN 40 THEN 1
+                                        WHEN 50 THEN 2
+                                        WHEN 60 THEN 3
+                                      END
+            INNER JOIN LOCALESTOQUE LE 
+                ON LE.CD_TIPOLOCAL = IL.CD_TIPOLOCAL
+                AND LE.CD_LOCAL = IL.CD_LOCAL
+            LEFT JOIN EXTEND_ORDERMSERVICO EO 
+                ON EO.CD_EMPRESA = SI.CD_EMPRESA 
+                AND EO.NR_ORDERMSERVICO = SI.NR_ORDEMSERVICO 
+                AND EO.CD_ITEM = SI.CD_ITEM
+            LEFT JOIN ITEMCONFERENCIAORDEM ICO 
+                ON ICO.CD_EMPRESA = OS.CD_EMPRESA 
+                AND ICO.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO 
+                AND ICO.CD_ITEM = SI.CD_ITEM
+            INNER JOIN MARCA M ON M.CD_MARCA = I.CD_MARCA
+            LEFT JOIN ITEMREQUISICAOOFICINA IRQ 
+                ON IRQ.CD_EMPRESAOS = OS.CD_EMPRESA 
+                AND IRQ.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO 
+                AND IRQ.CD_ITEM = SI.CD_ITEM
+            INNER JOIN SERVICOCALCULADO SC 
+                ON SC.CD_EMPRESA = SI.CD_EMPRESA
+                AND SC.NR_ORDEMSERVICO = SI.NR_ORDEMSERVICO 
+                AND SC.CD_ITEM = SI.CD_ITEM
+            WHERE OS.ST_ORDEMSERVICO = 'A'
+                AND OS.CD_EMPRESA = :empresas
+                AND COALESCE(EO.STATUS, 'N') IN ('I', 'F')
+                AND OS.DT_EMISSAO >= CURRENT_DATE - 30
+                AND IRQ.CD_EMPRESA IS NULL
+            GROUP BY
+                TIPO_TABLE, STATUS, CD_EMPRESA, CD_ITEM, DESCR,
+                CD_PESSOA, CD_VENDEDOR, SG_UNIDMED, DS_MARCA,
+                NR_ORDEMSERVICO, NM_CLIENTE, NM_VENDEDOR, QNT,
+                NM_SEPARADOR, CD_FORNECEDOR1, SC.QT_SOLICITADA, SC.QT_PEDIDA_E
+            HAVING SC.QT_SOLICITADA <> SC.QT_PEDIDA_E
+        )Y
+    ORDER BY Y.CD_EMPRESA, Y.NR_ORDEMSERVICO
     
     """
-    return db.execute_queries(query=_querie)
+    resultado = db.execute_queries(_query, params={"empresas": empresas})
+    return resultado
+
+def inserir_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
+    query = """
+        EXECUTE PROCEDURE EXTEND_ORDEMSERVICO(
+            :empresa, :orcamento, :item, :separador, 'I', :id
+        )
+    """
+    db.execute_udi(query=query, params={
+        "empresa": cd_empresa,
+        "orcamento": nr_orcamento,
+        "item": cd_item,
+        "separador": separador,
+        "id": id
+    })
 
 
-def inserir_orcamento(cd_empresa, nr_orcamento, cd_item, separador, id):
-    _querie = f"""EXECUTE PROCEDURE EXTEND_ORDEMSERVICO({cd_empresa}, {nr_orcamento}, {cd_item}, '{separador}', 'I', {id})"""
-    db.execute_UDI(query=_querie)
+def cancelar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
+    query = """
+        EXECUTE PROCEDURE EXTEND_ORDEMSERVICO(
+            :empresa, :orcamento, :item, :separador, 'C', :id
+        )
+    """
+    db.execute_udi(query=query, params={
+        "empresa": cd_empresa,
+        "orcamento": nr_orcamento,
+        "item": cd_item,
+        "separador": separador,
+        "id": id
+    })
 
-def cacelar_orcamento(cd_empresa, nr_orcamento, cd_item, separador, id):
-    _querie = f"""EXECUTE PROCEDURE EXTEND_ORDEMSERVICO({cd_empresa}, {nr_orcamento}, {cd_item}, '{separador}', 'C', {id})"""
-    db.execute_UDI(query=_querie)
 
-def finalizar_orcamento(cd_empresa, nr_orcamento, cd_item, separador, id):
-    _querie = f"""EXECUTE PROCEDURE EXTEND_ORDEMSERVICO({cd_empresa}, {nr_orcamento}, {cd_item}, '{separador}', 'F', {id})"""
-    db.execute_UDI(query=_querie)
+def finalizar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
+    query = """
+        EXECUTE PROCEDURE EXTEND_ORDEMSERVICO(
+            :empresa, :orcamento, :item, :separador, 'F', :id
+        )
+    """
+    db.execute_udi(query=query, params={
+        "empresa": cd_empresa,
+        "orcamento": nr_orcamento,
+        "item": cd_item,
+        "separador": separador,
+        "id": id
+    })
+
 

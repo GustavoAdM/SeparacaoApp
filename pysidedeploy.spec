@@ -64,10 +64,10 @@ plugins =
 macos.permissions = 
 
 # mode of using nuitka. accepts standalone or onefile. default is onefile.
-mode = standalone
+mode = onefile
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest,tkinter,pytest --enable-plugin=pyside6 --lto=yes --clang --show-progress --remove-output
+extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest,tkinter,pytest --enable-plugin=pyside6 --clang --show-progress --remove-output
 
 [buildozer]
 
