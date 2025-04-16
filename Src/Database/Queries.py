@@ -1,6 +1,7 @@
 from .Connection import db
 
-def pedidos_nao_separados(empresas: int= 50):
+
+def pedidos_nao_separados(empresas: int = 50):
     _query = f"""
         WITH PEDIDOS_SEPARACAO AS (
             SELECT
@@ -70,7 +71,6 @@ def cancelar(empresa: int, pedido: int):
     db.execute_udi(query=_query, params=[empresa, pedido])
 
 
-
 def finalizar(empresa: int, pedido: int):
     """Finaliza a separação atualizando status e data de fim"""
     _query = """
@@ -79,7 +79,6 @@ def finalizar(empresa: int, pedido: int):
         WHERE CD_EMPRESA = ? AND NR_PEDIDO = ?
     """
     db.execute_udi(query=_query, params=[empresa, pedido])
-
 
 
 def orcamentos_separacao(empresas: int = 50):
@@ -253,6 +252,7 @@ def inserir_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separado
         "separador": separador,
         "id": id
     })
+
 
 def cancelar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
     """
