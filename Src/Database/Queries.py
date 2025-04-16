@@ -1,7 +1,7 @@
 from .Connection import db
 
-def pedidos_nao_separados(empresas: list[int] = [50]):
-    _query = """
+def pedidos_nao_separados(empresas: int= 50):
+    _query = f"""
         WITH PEDIDOS_SEPARACAO AS (
             SELECT
                 'P' TIPO_TABLE,
@@ -29,7 +29,7 @@ def pedidos_nao_separados(empresas: list[int] = [50]):
             WHERE
                 P.TP_PEDIDO = 'S'
                 AND P.DT_PEDIDO = CURRENT_DATE
-                AND P.CD_EMPRESA IN :empresas
+                AND P.CD_EMPRESA = {empresas}
                 AND ICP.NR_PEDIDO IS NULL
                 AND P.ST_PEDIDO NOT IN ('A', 'P', 'C')
                 AND P.CD_TIPOPEDIDO IS NOT NULL
@@ -44,8 +44,8 @@ def pedidos_nao_separados(empresas: list[int] = [50]):
         FROM PEDIDOS_SEPARACAO PE
         WHERE PE.STATUS <> 'F'
     """
-    # Executa passando lista como parâmetro
-    resultado = db.execute_queries(_query, params={"empresas": empresas})
+    # Executa a consulta com os parâmetros
+    resultado = db.execute_query(_query, params=empresas)
     return resultado
 
 
@@ -55,27 +55,20 @@ def inserir_inicio(empresa: int, pedido: int, status: str, usuario: str):
         INSERT INTO EXTEND_SEPARACAO (
             CD_EMPRESA, NR_PEDIDO, NM_USUARIO, STATUS, DT_INICIO, DT_FIM
         ) VALUES (
-            :empresa, :pedido, :usuario, :status, CURRENT_TIMESTAMP, NULL
+            ?, ?, ?, ?, CURRENT_TIMESTAMP, NULL
         )
     """
-    db.execute_udi(query=_query, params={
-        "empresa": empresa,
-        "pedido": pedido,
-        "usuario": usuario,
-        "status": status
-    })
+    db.execute_udi(query=_query, params=[empresa, pedido, usuario, status])
 
 
 def cancelar(empresa: int, pedido: int):
     """Cancela uma separação (deleta o registro)"""
     _query = """
         DELETE FROM EXTEND_SEPARACAO
-        WHERE CD_EMPRESA = :empresa AND NR_PEDIDO = :pedido
+        WHERE CD_EMPRESA = ? AND NR_PEDIDO = ?
     """
-    db.execute_udi(query=_query, params={
-        "empresa": empresa,
-        "pedido": pedido
-    })
+    db.execute_udi(query=_query, params=[empresa, pedido])
+
 
 
 def finalizar(empresa: int, pedido: int):
@@ -83,17 +76,14 @@ def finalizar(empresa: int, pedido: int):
     _query = """
         UPDATE EXTEND_SEPARACAO
         SET STATUS = 'F', DT_FIM = CURRENT_TIMESTAMP
-        WHERE CD_EMPRESA = :empresa AND NR_PEDIDO = :pedido
+        WHERE CD_EMPRESA = ? AND NR_PEDIDO = ?
     """
-    db.execute_udi(query=_query, params={
-        "empresa": empresa,
-        "pedido": pedido
-    })
+    db.execute_udi(query=_query, params=[empresa, pedido])
+
 
 
 def orcamentos_separacao(empresas: int = 50):
-
-    _query = """
+    _query = f"""
     SELECT
         TIPO_TABLE, STATUS, CD_EMPRESA, CD_ITEM,
         DESCR, LOCALS, CD_PESSOA, CD_VENDEDOR, SG_UNIDMED,
@@ -113,7 +103,7 @@ def orcamentos_separacao(empresas: int = 50):
                     AND EO.NR_ORDERMSERVICO = SI.NR_ORDEMSERVICO 
                     AND EO.CD_ITEM = SI.CD_ITEM
                 WHERE SI.DT_REGISTRO BETWEEN CURRENT_TIMESTAMP-2 AND CURRENT_TIMESTAMP+1
-                    AND SI.CD_EMPRESA = :empresas
+                    AND SI.CD_EMPRESA = {empresas}
                 GROUP BY SI.CD_EMPRESA, SI.NR_ORDEMSERVICO, SI.CD_ITEM
                 HAVING MAX(COALESCE(SI.PS_SERVICOITEM, SI.QT_SERVICOITEM)) >= SUM(COALESCE(EO.PS_PEDIDO, EO.QT_PEDIDA, 0))
             )
@@ -135,7 +125,7 @@ def orcamentos_separacao(empresas: int = 50):
             INNER JOIN PESSOA PV ON (PV.CD_PESSOA = SI.CD_VENDEDOR)
             INNER JOIN ITEM I ON (I.CD_ITEM = SI.CD_ITEM)
             INNER JOIN ITEMLOCAL IL ON (IL.CD_ITEM = I.CD_ITEM
-                AND IL.CD_TIPOLOCAL = CASE :empresas
+                AND IL.CD_TIPOLOCAL = CASE {empresas}
                                         WHEN 7 THEN 7
                                         WHEN 40 THEN 1
                                         WHEN 50 THEN 2
@@ -154,7 +144,7 @@ def orcamentos_separacao(empresas: int = 50):
                     AND IRQ.NR_ORDEMSERVICO = OS.NR_ORDEMSERVICO
                     AND IRQ.CD_ITEM = SI.CD_ITEM)
             WHERE OS.ST_ORDEMSERVICO = 'A'
-                AND OS.CD_EMPRESA = :empresas
+                AND OS.CD_EMPRESA = {empresas}
                 AND ICO.NR_ORDEMSERVICO IS NULL
                 AND COALESCE(EO.STATUS, 'I') NOT IN ('F')
                 AND OS.DT_EMISSAO >= CURRENT_DATE - 30
@@ -195,7 +185,7 @@ def orcamentos_separacao(empresas: int = 50):
             INNER JOIN ITEM I ON I.CD_ITEM = SI.CD_ITEM
             INNER JOIN ITEMLOCAL IL 
                 ON IL.CD_ITEM = I.CD_ITEM
-                AND IL.CD_TIPOLOCAL = CASE :empresas
+                AND IL.CD_TIPOLOCAL = CASE {empresas}
                                         WHEN 7 THEN 7
                                         WHEN 40 THEN 1
                                         WHEN 50 THEN 2
@@ -222,7 +212,7 @@ def orcamentos_separacao(empresas: int = 50):
                 AND SC.NR_ORDEMSERVICO = SI.NR_ORDEMSERVICO 
                 AND SC.CD_ITEM = SI.CD_ITEM
             WHERE OS.ST_ORDEMSERVICO = 'A'
-                AND OS.CD_EMPRESA = :empresas
+                AND OS.CD_EMPRESA = {empresas}
                 AND COALESCE(EO.STATUS, 'N') IN ('I', 'F')
                 AND OS.DT_EMISSAO >= CURRENT_DATE - 30
                 AND IRQ.CD_EMPRESA IS NULL
@@ -234,15 +224,26 @@ def orcamentos_separacao(empresas: int = 50):
             HAVING SC.QT_SOLICITADA <> SC.QT_PEDIDA_E
         )Y
     ORDER BY Y.CD_EMPRESA, Y.NR_ORDEMSERVICO
-    
     """
-    resultado = db.execute_queries(_query, params={"empresas": empresas})
+
+    # A ordem dos parâmetros corresponde à ordem de aparição dos `?` no SQL
+    resultado = db.execute_query(_query, params=[])
     return resultado
 
+
 def inserir_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
-    query = """
+    """
+    Insere um item no orçamento (EXTEND_ORDEMSERVICO) com status 'I' (Inserido).
+
+    :param cd_empresa: Código da empresa
+    :param nr_orcamento: Número do orçamento (ordem de serviço)
+    :param cd_item: Código do item
+    :param separador: Nome do separador
+    :param id: Identificador interno
+    """
+    query = f"""
         EXECUTE PROCEDURE EXTEND_ORDEMSERVICO(
-            :empresa, :orcamento, :item, :separador, 'I', :id
+            {cd_empresa}, {nr_orcamento}, {cd_item}, '{separador}', 'I', {id}
         )
     """
     db.execute_udi(query=query, params={
@@ -253,11 +254,19 @@ def inserir_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separado
         "id": id
     })
 
-
 def cancelar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
-    query = """
+    """
+    Cancela um item do orçamento (EXTEND_ORDEMSERVICO) com status 'C' (Cancelado).
+
+    :param cd_empresa: Código da empresa
+    :param nr_orcamento: Número do orçamento (ordem de serviço)
+    :param cd_item: Código do item
+    :param separador: Nome do separador
+    :param id: Identificador interno
+    """
+    query = f"""
         EXECUTE PROCEDURE EXTEND_ORDEMSERVICO(
-            :empresa, :orcamento, :item, :separador, 'C', :id
+            {cd_empresa}, {nr_orcamento}, {cd_item}, '{separador}', 'C', {id}
         )
     """
     db.execute_udi(query=query, params={
@@ -270,9 +279,18 @@ def cancelar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separad
 
 
 def finalizar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separador: str, id: int):
-    query = """
+    """
+    Finaliza um item do orçamento (EXTEND_ORDEMSERVICO) com status 'F' (Finalizado).
+
+    :param cd_empresa: Código da empresa
+    :param nr_orcamento: Número do orçamento (ordem de serviço)
+    :param cd_item: Código do item
+    :param separador: Nome do separador
+    :param id: Identificador interno
+    """
+    query = f"""
         EXECUTE PROCEDURE EXTEND_ORDEMSERVICO(
-            :empresa, :orcamento, :item, :separador, 'F', :id
+            {cd_empresa}, {nr_orcamento}, {cd_item}, '{separador}', 'F', {id}
         )
     """
     db.execute_udi(query=query, params={
@@ -282,5 +300,3 @@ def finalizar_orcamento(cd_empresa: int, nr_orcamento: int, cd_item: int, separa
         "separador": separador,
         "id": id
     })
-
-

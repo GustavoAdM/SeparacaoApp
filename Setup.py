@@ -4,7 +4,7 @@ from PySide6.QtCore import QModelIndex, Qt, QTimer, QThread, Signal
 from Ui.main import Ui_MainWindow
 from Src.Database.Queries import (pedidos_nao_separados, inserir_inicio, cancelar,
                                   finalizar, orcamentos_separacao, inserir_orcamento,
-                                  cacelar_orcamento, finalizar_orcamento)
+                                  cancelar_orcamento, finalizar_orcamento)
 from Src.Layout.RomaneiroSeparacao import RomaneioSeparacao
 from Src.Utils.ElgineLabelPrinter import ElginLabelPrinter
 import datetime
@@ -25,9 +25,9 @@ class WorkerThread(QThread):
         try:
             # Obtém os dados (no seu caso, os pedidos)
             if self.tabela == "P":
-                data = pedidos_nao_separados(empresa=self.empresa)
+                data = pedidos_nao_separados(empresas=self.empresa)
             elif self.tabela == "O":
-                data = orcamentos_separacao(cd_empresa=self.empresa)
+                data = orcamentos_separacao(empresas=self.empresa)
 
             # Emite o sinal com os dados quando terminar
             self.data_ready.emit(data, self.tabela)
@@ -66,8 +66,7 @@ class MainWindow(QMainWindow):
         self.ui.finalizar.clicked.connect(self.finalizar)
 
         # Gatilhos de eventos Orçamento
-        self.ui.TW_ordemservico.selectionModel(
-        ).selectionChanged.connect(self.get_value_orcamento)
+        self.ui.TW_ordemservico.selectionModel().selectionChanged.connect(self.get_value_orcamento)
 
         # Variáveis de controle
         self.pedido = []
@@ -148,21 +147,20 @@ class MainWindow(QMainWindow):
             if not self.pedido:
                 self.info_error(
                     "Por favor, selecione um pedido para continuar.")
-
             if self.tipo_tabela == "P":
                 inserir_inicio(
                     empresa=self.empresa, pedido=self.pedido[0], status='I', usuario=self.usuario)
             elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, id, *_ in self.pedido:
+                for empresa, orcamento, item, status, idItem, *_ in self.pedido:
                     if status == "N":
                         inserir_orcamento(
-                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=id)
+                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=idItem)
                 self.ui.TW_ordemservico.clearSelection()
                 self.gerar_romaneio()
-                
 
             self.add_data_to_table()
             self.mostrar_encerrar()
+            self.pedido.clear()
         except Exception as e:
             self.info_error(f"Erro ao iniciar pedido: {e}")
 
@@ -176,14 +174,15 @@ class MainWindow(QMainWindow):
             if self.tipo_tabela == "P":
                 cancelar(empresa=self.empresa, pedido=self.pedido[0])
             elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, id, *_ in self.pedido:
+                for empresa, orcamento, item, status, iditem, *_ in self.pedido:
                     if status == "I":
-                        cacelar_orcamento(
-                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=id)
+                        cancelar_orcamento(
+                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=iditem)
                 self.ui.TW_ordemservico.clearSelection()
 
             self.add_data_to_table()
             self.mostrar_iniciar()
+            self.pedido.clear()
         except Exception as e:
             self.info_error(f"Erro ao cancelar pedido: {e}")
 
@@ -197,15 +196,16 @@ class MainWindow(QMainWindow):
             if self.tipo_tabela == "P":
                 finalizar(empresa=self.empresa, pedido=self.pedido[0])
             elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, id, *_ in self.pedido:
+                for empresa, orcamento, item, status, iditem, *_ in self.pedido:
                     if status == "I":
                         finalizar_orcamento(
-                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=id)
+                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=iditem)
 
                 self.ui.TW_ordemservico.clearSelection()
 
             self.add_data_to_table()
             self.mostrar_iniciar()
+            self.pedido.clear()
         except Exception as e:
             self.info_error(f"Erro ao finalizar pedido: {e}")
 
@@ -244,19 +244,14 @@ class MainWindow(QMainWindow):
 
     def get_value_orcamento(self, selected, deselected):
         """Atualiza a lista de seleções quando as linhas são selecionadas ou desmarcadas"""
-        if self.limpar_pedidos:
-            self.pedido.clear()
-            self.limpar_pedidos = False
-
         # Para cada linha desmarcada, removemos o código da lista
         self.ui.ListaPedido.clearSelection()
 
         # Desabilitar atualizações para evitar redraws frequentes
         self.ui.TW_ordemservico.setUpdatesEnabled(False)
 
-        for index in deselected.indexes():
-            row = index.row()
-
+        deselected_rows = {index.row() for index in deselected.indexes()}
+        for row in deselected_rows:
             # Acessa todas as células necessárias
             status = self.ui.TW_ordemservico.item(row, 1).text()
             cod_empres = self.ui.TW_ordemservico.item(row, 2).text()
@@ -276,7 +271,7 @@ class MainWindow(QMainWindow):
                       locais, vendedor, quantidade, unidade, marca, cd_fornecedor)
 
             # Verifica se o pedido está na lista de pedidos e remove
-            if pedido in self.pedido:
+            if not pedido in self.pedido:
                 self.tipo_tabela = "O"
                 self.pedido.remove(pedido)
 
@@ -287,9 +282,9 @@ class MainWindow(QMainWindow):
                     self.mostrar_encerrar()
 
         # Para cada linha selecionada, adicionamos o código à lista
-        for index in selected.indexes():
-            row = index.row()
+        selected_rows = {index.row() for index in selected.indexes()}
 
+        for row in selected_rows:
             # Acessa todas as células necessárias
             status = self.ui.TW_ordemservico.item(row, 1).text()
             cod_empres = self.ui.TW_ordemservico.item(row, 2).text()
@@ -304,15 +299,14 @@ class MainWindow(QMainWindow):
             cd_fornecedor = self.ui.TW_ordemservico.item(row, 17).text()
             id = self.ui.TW_ordemservico.item(row, 16).text()
 
+
             # Cria uma tupla com as informações relevantes
             pedido = (cod_empres, nr_orcamento, cod_item, status, id, desc_item,
                       locais, vendedor, quantidade, unidade, marca, cd_fornecedor)
 
-            # Adiciona à lista se o pedido não estiver presente
-            if pedido not in self.pedido:
+            if not pedido in self.pedido:   
                 self.tipo_tabela = "O"
                 self.pedido.append(pedido)
-
                 # Atualiza a interface dependendo do status
                 if status == "N":
                     self.mostrar_iniciar()
@@ -353,16 +347,16 @@ class MainWindow(QMainWindow):
     def update_table_from_thread(self, data, tabela):
         """Método que será chamado quando o WorkerThread emitir os dados."""
         if tabela == "P":
-            self.update_table(self.ui.ListaPedido, data, tabela)
+            self.update_table(data, tabela, self.ui.ListaPedido)
         elif tabela == "O":
-            self.update_table(self.ui.TW_ordemservico, data, tabela)
+            self.update_table(data, tabela, self.ui.TW_ordemservico)
 
-    def update_table(self, table_widget, data, tabela):
+    def update_table(self, data, tabela, table_widget):
         """Atualiza uma tabela com os dados fornecidos."""
         try:
             table_widget.setRowCount(len(data))
             # Desabilita atualizações visuais
-            table_widget.setUpdatesEnabled(False)
+            table_widget.setUpdatesEnabled(True)
 
             for row_idx, row_data in enumerate(data):
                 for col_idx, item in enumerate(row_data):
@@ -379,9 +373,6 @@ class MainWindow(QMainWindow):
                     cell.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     table_widget.setItem(row_idx, col_idx, cell)
 
-            # Reabilita atualizações visuais
-            table_widget.setUpdatesEnabled(True)
-
         except Exception as e:
             self.info_error(f"Erro ao atualizar a tabela: {e}")
 
@@ -389,6 +380,7 @@ class MainWindow(QMainWindow):
         caminho_pedf = self.config["impressao"]["caminho_relatorio"]
         pdf = RomaneioSeparacao(f"{caminho_pedf}\\{self.usuario}")
         pdf.adicionar_primeira_pagina()
+        print(self.pedido)
         pdf.adicionar_itens(self.pedido)
         pdf.adicionar_assinatura(self.usuario)
         nome_arquivo = pdf.salvar_pdf()
