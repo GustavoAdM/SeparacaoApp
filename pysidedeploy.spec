@@ -8,7 +8,7 @@ title = SeparadorApp
 project_dir = C:\Users\Belenzier\Desktop\WorkSpace\Separacao
 
 # source file path
-input_file = C:\Users\Belenzier\Desktop\WorkSpace\Separacao\Setup.py
+input_file = C:\Users\Belenzier\Desktop\WorkSpace\Separacao\SeparadorApp.py
 
 # directory where exec is stored
 exec_directory = .
@@ -40,7 +40,7 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Widgets,Core,Gui
+modules = Core,Widgets,Gui
 
 # qt plugins used by the application
 plugins = platforms,imageformats,styles
@@ -67,7 +67,7 @@ macos.permissions =
 mode = onefile
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing --enable-plugin=pyside6 --show-progress --remove-output
+extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing,test --clang --enable-plugin=pyside6 --show-progress --remove-output
 
 [buildozer]
 
