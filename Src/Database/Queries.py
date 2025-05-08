@@ -43,6 +43,7 @@ def pedidos_nao_separados(empresas: int = 50):
             TIPO_TABLE, STATUS, CD_EMPRESA
         FROM PEDIDOS_SEPARACAO PE
         WHERE PE.STATUS <> 'F'
+        ORDER BY NR_PEDIDO
     """
     # Executa a consulta com os parâmetros
     resultado = db.execute_query(_query, params=empresas)
@@ -272,7 +273,7 @@ def orcamentos_separacao(empresas: int = 50):
     V INDEX (PK_VEICULO))), CV INDEX (PK_CORVEICULO)), IRQ INDEX (IDX001_ITEMREQUISICAOOFICINA)))
 
     )Y
-    ORDER BY Y.CD_EMPRESA, Y.NR_ORDEMSERVICO
+    ORDER BY Y.NR_ORDEMSERVICO
     """
 
     # A ordem dos parâmetros corresponde à ordem de aparição dos `?` no SQL

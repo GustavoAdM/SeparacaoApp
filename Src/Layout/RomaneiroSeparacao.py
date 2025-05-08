@@ -51,7 +51,6 @@ class RomaneioSeparacao:
         :param itens: Lista de dicionários contendo os dados dos itens.
         """
         self.c.setFont(*self.fonte_itens)  # Definir a fonte para os itens
-        print(itens)
 
         for item in itens:
             # Verificar se há espaço suficiente na página para mais uma linha
