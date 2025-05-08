@@ -6,7 +6,7 @@ from queue import Queue, Empty
 from threading import Lock
 
 class FirebirdDB:
-    def __init__(self, config_file='Config\\Config.ini', pool_size=5):
+    def __init__(self, config_file='Config\\Config.ini', pool_size=3):
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
 

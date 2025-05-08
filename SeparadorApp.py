@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 from PySide6.QtCore import QModelIndex, Qt, QTimer, QThread, Signal
-from Ui.main import Ui_MainWindow
+from Ui.main import Ui_Separadorapp
 from Src.Database.Queries import (pedidos_nao_separados, inserir_inicio, cancelar,
                                   finalizar, orcamentos_separacao, inserir_orcamento,
                                   cancelar_orcamento, finalizar_orcamento)
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.ui = Ui_MainWindow()
+        self.ui = Ui_Separadorapp()
         self.ui.setupUi(self)
 
         # Carregar configuração .ini
@@ -69,16 +69,16 @@ class MainWindow(QMainWindow):
         self.ui.TW_ordemservico.selectionModel().selectionChanged.connect(self.get_value_orcamento)
 
         # Variáveis de controle
-        self.pedido = []
+        self.pedido = None
+        self.ordemservico = []
         self.usuario = None
         self.empresa = None
-        self.tipo_tabela = ""
-        self.limpar_pedidos = False
+        self.tipo_tabela = "P"
 
-        # Timer para atualizar a tabela a cada 10 segundos
+        # Timer para atualizar a tabela a cada 6 segundos
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.add_data_to_table)
-        self.timer.start(10000)
+        self.timer.start(5000)
 
     def load_config(self):
         """Carrega as configurações do arquivo INI."""
@@ -93,14 +93,15 @@ class MainWindow(QMainWindow):
     def on_click_table(self, index: QModelIndex):
         """Gatilho quando um item de qualquer tabela é clicado."""
         try:
-            self.limpar_pedidos = True
+            # Limpa a selecação e as OS selecionado da lista
             self.ui.TW_ordemservico.clearSelection()
+            self.ordemservico.clear()
+            self.tipo_tabela = "P"
 
-            self.tipo_tabela = 'P'
             row = index.row()
-            self.pedido = self.get_value_nrpedido(row)
-            self.empresa = self.get_empresa_pedido(row)
-            status_pedido = self.get_status_pedido(row)
+            self.pedido = self.ui.ListaPedido.item(row, 3).text()
+            self.empresa = self.ui.ListaPedido.item(row, 9).text()
+            status_pedido = self.ui.ListaPedido.item(row, 8).text()
 
             self.ui.usuario.setCurrentIndex(0)
 
@@ -111,19 +112,63 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.info_error(f"Erro ao processar clique na tabela: {e}")
 
+    def get_value_orcamento(self, selected, deselected):
+        """Atualiza a lista de seleções quando as linhas são selecionadas ou desmarcadas"""
+        self.ui.ListaPedido.clearSelection()
+        self.ui.TW_ordemservico.setUpdatesEnabled(True)
+        self.pedido = None
+        self.tipo_tabela = "O"
+
+
+        def extrair_pedido(row):
+            """Extrai as informações da linha como uma tupla de pedido"""
+            def get(col): return self.ui.TW_ordemservico.item(row, col).text()
+            return (
+                get(8),  # EMPRESA
+                get(0),  # nr_orcamento
+                get(9),  # cod_item
+                get(10),  # status
+                get(7),  # id
+                get(4),  # desc_item
+                get(15),  # locais
+                get(2),  # vendedor
+                get(5),  # quantidade
+                get(14),  # unidade
+                get(16),  # marca
+                get(11),  # cd_fornecedor
+            )
+
+        def atualizar_interface(status):
+            if status == "N":
+                self.mostrar_iniciar()
+            elif status == "I":
+                self.mostrar_encerrar()
+
+        # Processa remoções
+        for row in {i.row() for i in deselected.indexes()}:
+            pedido = extrair_pedido(row)
+            status = pedido[3]
+            if pedido in self.ordemservico:
+                self.ordemservico.remove(pedido)
+                atualizar_interface(status)
+
+        # Processa adições
+        for row in {i.row() for i in selected.indexes()}:
+            pedido = extrair_pedido(row)
+            status = pedido[3]
+            if pedido not in self.ordemservico:
+                self.ordemservico.append(pedido)
+                atualizar_interface(status)
+
     def mostrar_iniciar(self):
         """Exibe os elementos para iniciar o processo."""
-        self.ui.iniciar.show()
-        self.ui.usuario.show()
-        self.ui.cancelar.hide()
-        self.ui.finalizar.hide()
+        self.ui.exbir_iniciar.show()
+        self.ui.exibir_finalizar.hide()
 
     def mostrar_encerrar(self):
         """Exibe os elementos para encerrar o processo."""
-        self.ui.iniciar.hide()
-        self.ui.usuario.hide()
-        self.ui.cancelar.show()
-        self.ui.finalizar.show()
+        self.ui.exbir_iniciar.hide()
+        self.ui.exibir_finalizar.show()
 
     def inserir_usuario(self):
         """Popula o campo de usuários com dados da configuração."""
@@ -136,6 +181,11 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.info_error(f"Erro ao inserir usuários: {e}")
 
+    def get_value_usuario(self):
+        """Obtém o valor do usuário selecionado."""
+        self.usuario = self.ui.usuario.currentText()
+
+    ########## Ação dos Botões ###########
     def iniciar(self):
         """Inicia o pedido com a informação do usuário e pedido selecionados."""
         try:
@@ -143,186 +193,111 @@ class MainWindow(QMainWindow):
                 self.info_error(
                     "Campo usuário obrigatório. Por favor, preencha o campo usuário antes de continuar.")
                 return
-
-            if not self.pedido:
+            
+            if not self.pedido and self.tipo_tabela == "P":
                 self.info_error(
-                    "Por favor, selecione um pedido para continuar.")
-            if self.tipo_tabela == "P":
+                    "Por favor, selecione um pedido ou uma ordem de serviço para continuar.")
+                return
+            elif not self.ordemservico and self.tipo_tabela == "O":
+                self.info_error(
+                    "Por favor, selecione um pedido ou uma ordem de serviço para continuar.")
+                return
+
+            if self.pedido and self.tipo_tabela == "P":
+    
                 inserir_inicio(
-                    empresa=self.empresa, pedido=self.pedido[0], status='I', usuario=self.usuario)
-            elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, idItem, *_ in self.pedido:
+                    empresa=self.empresa,
+                    pedido=self.pedido,
+                    status='I',
+                    usuario=self.usuario
+                )
+
+            elif self.ordemservico:
+                for empresa, orcamento, item, status, idItem, *_ in self.ordemservico:
                     if status == "N":
                         inserir_orcamento(
-                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=idItem)
-                self.ui.TW_ordemservico.clearSelection()
+                            cd_empresa=empresa,
+                            nr_orcamento=orcamento,
+                            cd_item=item,
+                            separador=self.usuario,
+                            id=idItem
+                        )
                 self.gerar_romaneio()
+                self.ui.TW_ordemservico.clearSelection()
 
             self.add_data_to_table()
             self.mostrar_encerrar()
-            self.pedido.clear()
+
         except Exception as e:
             self.info_error(f"Erro ao iniciar pedido: {e}")
 
     def cancelar(self):
-        """Cancela o pedido selecionado."""
+        """Cancela o pedido ou a ordem de serviço selecionada."""
         try:
-            if not self.pedido:
-                self.info_error("Selecione um pedido para cancelar.")
+            if not self.pedido and self.tipo_tabela == "P":
+                self.info_error(
+                    "Selecione um pedido ou ordem de serviço para cancelar.")
+                return
+            elif not self.ordemservico and self.tipo_tabela == "O":
+                self.info_error(
+                    "Selecione um pedido ou ordem de serviço para cancelar.")
                 return
 
-            if self.tipo_tabela == "P":
-                cancelar(empresa=self.empresa, pedido=self.pedido[0])
-            elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, iditem, *_ in self.pedido:
+            if self.pedido:
+                cancelar(empresa=self.empresa, pedido=self.pedido)
+
+            elif self.ordemservico:
+                for empresa, orcamento, item, status, iditem, *_ in self.ordemservico:
                     if status == "I":
                         cancelar_orcamento(
-                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=iditem)
+                            cd_empresa=empresa,
+                            nr_orcamento=orcamento,
+                            cd_item=item,
+                            separador=self.usuario,
+                            id=iditem
+                        )
                 self.ui.TW_ordemservico.clearSelection()
 
             self.add_data_to_table()
             self.mostrar_iniciar()
-            self.pedido.clear()
+
         except Exception as e:
             self.info_error(f"Erro ao cancelar pedido: {e}")
 
     def finalizar(self):
-        """Finaliza o pedido selecionado."""
+        """Finaliza o pedido ou a ordem de serviço selecionada."""
         try:
-            if not self.pedido:
-                self.info_error("Selecione um pedido para finalizar.")
+            if not self.pedido and self.tipo_tabela == "P":
+                self.info_error(
+                    "Selecione um pedido ou ordem de serviço para finalizar.")
+                return
+            elif not self.ordemservico and self.tipo_tabela == "O":
+                self.info_error(
+                    "Selecione um pedido ou ordem de serviço para finalizar.")
                 return
 
-            if self.tipo_tabela == "P":
-                finalizar(empresa=self.empresa, pedido=self.pedido[0])
-            elif self.tipo_tabela == "O":
-                for empresa, orcamento, item, status, iditem, *_ in self.pedido:
+            if self.pedido:
+                finalizar(empresa=self.empresa, pedido=self.pedido)
+
+            elif self.ordemservico:
+                for empresa, orcamento, item, status, iditem, *_ in self.ordemservico:
                     if status == "I":
                         finalizar_orcamento(
-                            cd_empresa=empresa, nr_orcamento=orcamento, cd_item=item, separador=self.usuario, id=iditem)
-
+                            cd_empresa=empresa,
+                            nr_orcamento=orcamento,
+                            cd_item=item,
+                            separador=self.usuario,
+                            id=iditem
+                        )
                 self.ui.TW_ordemservico.clearSelection()
 
             self.add_data_to_table()
             self.mostrar_iniciar()
-            self.pedido.clear()
+
         except Exception as e:
             self.info_error(f"Erro ao finalizar pedido: {e}")
 
-    def get_value_usuario(self):
-        """Obtém o valor do usuário selecionado."""
-        self.usuario = self.ui.usuario.currentText()
-
-    def get_value_nrpedido(self, row):
-        """Obtém o número do pedido na linha especificada."""
-        try:
-            self.tipo_tabela = "P"
-            nr_pedido_index = self.ui.ListaPedido.model().index(row, 4)
-            return [self.ui.ListaPedido.model().data(nr_pedido_index)]
-        except Exception as e:
-            self.info_error(f"Erro ao obter número do pedido: {e}")
-            return None
-
-    def get_status_pedido(self, row):
-        """Obtém o status do pedido na linha especificada."""
-        try:
-            self.tipo_tabela = "P"
-            status_index = self.ui.ListaPedido.model().index(row, 1)
-            return self.ui.ListaPedido.model().data(status_index)
-        except Exception as e:
-            self.info_error(f"Erro ao obter status do pedido: {e}")
-            return None
-
-    def get_empresa_pedido(self, row):
-        """Obtém a empresa do pedido na linha especificada."""
-        try:
-            empresa_pedido_index = self.ui.ListaPedido.model().index(row, 2)
-            return self.ui.ListaPedido.model().data(empresa_pedido_index)
-        except Exception as e:
-            self.info_error(f"Erro ao obter empresa do pedido: {e}")
-            return None
-
-    def get_value_orcamento(self, selected, deselected):
-        """Atualiza a lista de seleções quando as linhas são selecionadas ou desmarcadas"""
-        # Para cada linha desmarcada, removemos o código da lista
-        self.ui.ListaPedido.clearSelection()
-
-        # Desabilitar atualizações para evitar redraws frequentes
-        self.ui.TW_ordemservico.setUpdatesEnabled(False)
-
-        deselected_rows = {index.row() for index in deselected.indexes()}
-        for row in deselected_rows:
-            # Acessa todas as células necessárias
-            status = self.ui.TW_ordemservico.item(row, 1).text()
-            cod_empres = self.ui.TW_ordemservico.item(row, 2).text()
-            cod_item = self.ui.TW_ordemservico.item(row, 3).text()
-            desc_item = self.ui.TW_ordemservico.item(row, 4).text()
-            locais = self.ui.TW_ordemservico.item(row, 5).text()
-            unidade = self.ui.TW_ordemservico.item(row, 8).text()
-            marca = self.ui.TW_ordemservico.item(row, 9).text()
-            nr_orcamento = self.ui.TW_ordemservico.item(row, 10).text()
-            vendedor = self.ui.TW_ordemservico.item(row, 12).text()
-            quantidade = self.ui.TW_ordemservico.item(row, 14).text()
-            cd_fornecedor = self.ui.TW_ordemservico.item(row, 17).text()
-            id = self.ui.TW_ordemservico.item(row, 16).text()
-
-            # Cria uma tupla com as informações relevantes
-            pedido = (cod_empres, nr_orcamento, cod_item, status, id, desc_item,
-                      locais, vendedor, quantidade, unidade, marca, cd_fornecedor)
-
-            # Verifica se o pedido está na lista de pedidos e remove
-            if not pedido in self.pedido:
-                self.tipo_tabela = "O"
-                self.pedido.remove(pedido)
-
-                # Atualiza a interface dependendo do status
-                if status == "N":
-                    self.mostrar_iniciar()
-                elif status == "I":
-                    self.mostrar_encerrar()
-
-        # Para cada linha selecionada, adicionamos o código à lista
-        selected_rows = {index.row() for index in selected.indexes()}
-
-        for row in selected_rows:
-            # Acessa todas as células necessárias
-            status = self.ui.TW_ordemservico.item(row, 1).text()
-            cod_empres = self.ui.TW_ordemservico.item(row, 2).text()
-            cod_item = self.ui.TW_ordemservico.item(row, 3).text()
-            desc_item = self.ui.TW_ordemservico.item(row, 4).text()
-            locais = self.ui.TW_ordemservico.item(row, 5).text()
-            unidade = self.ui.TW_ordemservico.item(row, 8).text()
-            marca = self.ui.TW_ordemservico.item(row, 9).text()
-            nr_orcamento = self.ui.TW_ordemservico.item(row, 10).text()
-            vendedor = self.ui.TW_ordemservico.item(row, 12).text()
-            quantidade = self.ui.TW_ordemservico.item(row, 14).text()
-            cd_fornecedor = self.ui.TW_ordemservico.item(row, 17).text()
-            id = self.ui.TW_ordemservico.item(row, 16).text()
-
-
-            # Cria uma tupla com as informações relevantes
-            pedido = (cod_empres, nr_orcamento, cod_item, status, id, desc_item,
-                      locais, vendedor, quantidade, unidade, marca, cd_fornecedor)
-
-            if not pedido in self.pedido:   
-                self.tipo_tabela = "O"
-                self.pedido.append(pedido)
-                # Atualiza a interface dependendo do status
-                if status == "N":
-                    self.mostrar_iniciar()
-                elif status == "I":
-                    self.mostrar_encerrar()
-
-        # Reabilitar atualizações de UI
-        self.ui.TW_ordemservico.setUpdatesEnabled(True)
-        self.tipo_tabela = "O"
-
-    def info_error(self, msg):
-        """Exibe uma mensagem de erro na interface."""
-        self.ui.infos.setText(f'Erro: {msg}')
-
-    def click_tabela_orcamento(self):
-        self.pedido.clear()
+    ######### ATUALIZAÇÃO DOS DADOS DA TABELA #########
 
     def add_data_to_table(self):
         """Atualiza os dados da tabela com os pedidos não separados."""
@@ -365,10 +340,10 @@ class MainWindow(QMainWindow):
                     cell = QTableWidgetItem(item)
                     if tabela == "P":
                         alignment = Qt.AlignLeft | Qt.AlignVCenter if col_idx in {
-                            5, 6} else Qt.AlignCenter
+                            0, 4, 5} else Qt.AlignCenter
                     elif tabela == "O":
                         alignment = Qt.AlignLeft | Qt.AlignVCenter if col_idx in {
-                            11, 12, 13} else Qt.AlignCenter
+                            1, 2, 3, 4} else Qt.AlignCenter
                     cell.setTextAlignment(alignment)
                     cell.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     table_widget.setItem(row_idx, col_idx, cell)
@@ -376,12 +351,19 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.info_error(f"Erro ao atualizar a tabela: {e}")
 
+    def info_error(self, msg):
+        """Exibe uma mensagem de erro na interface."""
+        self.ui.infos.setText(f'Erro: {msg}')
+
+    """
+    ######### IMRESSAO DE ROMANEIO ###########
+    """
+
     def gerar_romaneio(self):
         caminho_pedf = self.config["impressao"]["caminho_relatorio"]
         pdf = RomaneioSeparacao(f"{caminho_pedf}\\{self.usuario}")
         pdf.adicionar_primeira_pagina()
-        print(self.pedido)
-        pdf.adicionar_itens(self.pedido)
+        pdf.adicionar_itens(self.ordemservico)
         pdf.adicionar_assinatura(self.usuario)
         nome_arquivo = pdf.salvar_pdf()
 

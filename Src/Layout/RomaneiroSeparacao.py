@@ -21,7 +21,7 @@ class RomaneioSeparacao:
         self.y_atual = self.comprimento - 35 * mm  # Posição inicial para os itens
         self.altura_linha = 12 * mm
 
-    def adicionar_primeira_pagina(self, cliente=None, vendedor=None):
+    def adicionar_primeira_pagina(self):
         """
         Adiciona a primeira página com informações fixas, como título, cliente e vendedor.
         :param cliente: Nome do cliente.
@@ -51,13 +51,14 @@ class RomaneioSeparacao:
         :param itens: Lista de dicionários contendo os dados dos itens.
         """
         self.c.setFont(*self.fonte_itens)  # Definir a fonte para os itens
+        print(itens)
 
         for item in itens:
             # Verificar se há espaço suficiente na página para mais uma linha
-            if self.y_atual < 20 * mm:  # Limite inferior da página
-                self.c.showPage()  # Finaliza a página atual e inicia uma nova
-                self.y_atual = self.comprimento - 35 * mm  # Reinicia a posição Y para a nova página
-                self.c.setFont(*self.fonte_itens)  # Redefinir a fonte após criar uma nova página
+            #if self.y_atual < 20 * mm:  # Limite inferior da página
+            #    self.c.showPage()  # Finaliza a página atual e inicia uma nova
+            #    self.y_atual = self.comprimento - 35 * mm  # Reinicia a posição Y para a nova página
+            #    self.c.setFont(*self.fonte_itens)  # Redefinir a fonte após criar uma nova página
 
             # Adicionar o item
             self.c.drawString(7 * mm, self.y_atual - 1, item[1]) #  Os

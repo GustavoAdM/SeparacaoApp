@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Separadorapp</class>
+ <widget class="QMainWindow" name="Separadorapp">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -53,6 +56,9 @@
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="textAlignment">
+      <set>AlignLeading|AlignVCenter</set>
+     </property>
     </column>
     <column>
      <property name="text">
@@ -63,6 +69,9 @@
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
     </column>
     <column>
      <property name="text">
@@ -72,6 +81,9 @@
       <font>
        <pointsize>10</pointsize>
       </font>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
      </property>
     </column>
     <column>
@@ -125,17 +137,17 @@
     </column>
     <column>
      <property name="text">
-      <string>Tipo</string>
+      <string>_TIPO</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Status</string>
+      <string>_STATUS</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Empresa</string>
+      <string>_CD_EMPRESA</string>
      </property>
     </column>
    </widget>
@@ -149,80 +161,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="usuario">
-    <property name="geometry">
-     <rect>
-      <x>1138</x>
-      <y>35</y>
-      <width>191</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <item>
-     <property name="text">
-      <string/>
-     </property>
-    </item>
-   </widget>
-   <widget class="QPushButton" name="iniciar">
-    <property name="geometry">
-     <rect>
-      <x>1168</x>
-      <y>143</y>
-      <width>131</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(0, 255, 0);
-font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Iniciar</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="cancelar">
-    <property name="geometry">
-     <rect>
-      <x>1168</x>
-      <y>143</y>
-      <width>131</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 255, 0);
-font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Cancelar</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="finalizar">
-    <property name="geometry">
-     <rect>
-      <x>1168</x>
-      <y>225</y>
-      <width>131</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 0, 0);
-font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Finalizar</string>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>1151</x>
-      <y>367</y>
+      <x>1130</x>
+      <y>370</y>
       <width>171</width>
       <height>41</height>
      </rect>
@@ -240,8 +183,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
    <widget class="QLineEdit" name="lineEdit_2">
     <property name="geometry">
      <rect>
-      <x>1151</x>
-      <y>417</y>
+      <x>1130</x>
+      <y>420</y>
       <width>171</width>
       <height>41</height>
      </rect>
@@ -259,8 +202,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
    <widget class="QLineEdit" name="lineEdit_3">
     <property name="geometry">
      <rect>
-      <x>1151</x>
-      <y>467</y>
+      <x>1130</x>
+      <y>470</y>
       <width>171</width>
       <height>41</height>
      </rect>
@@ -323,7 +266,7 @@ font: 75 12pt &quot;Arial&quot;;</string>
     </property>
     <column>
      <property name="text">
-      <string>Tipo</string>
+      <string>OS</string>
      </property>
      <property name="textAlignment">
       <set>AlignCenter</set>
@@ -331,63 +274,10 @@ font: 75 12pt &quot;Arial&quot;;</string>
     </column>
     <column>
      <property name="text">
-      <string>Status</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Empresa</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>CodItem</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>DescItem</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Locals</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>CodCliente</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>CodVendedor</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Unidade</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Marca</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Orçamento</string>
+      <string>Veiculo</string>
      </property>
      <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Cliente</string>
-     </property>
-     <property name="textAlignment">
-      <set>AlignHCenter|AlignBottom</set>
+      <set>AlignLeading|AlignVCenter</set>
      </property>
     </column>
     <column>
@@ -400,12 +290,23 @@ font: 75 12pt &quot;Arial&quot;;</string>
     </column>
     <column>
      <property name="text">
-      <string>Item</string>
+      <string>Mecanico</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeading|AlignVCenter</set>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Quant.</string>
+      <string>Item</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeading|AlignVCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Qtde</string>
      </property>
      <property name="textAlignment">
       <set>AlignCenter</set>
@@ -415,17 +316,157 @@ font: 75 12pt &quot;Arial&quot;;</string>
      <property name="text">
       <string>Separador</string>
      </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>ID</string>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Cod Forn</string>
+      <string>_ID</string>
      </property>
     </column>
+    <column>
+     <property name="text">
+      <string>_CD_EMPRESA</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_CD_ITEM</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_STATUS</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_CD_FORNECEDOR</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_CD_VENDEDOR</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_NM_CLIENTE</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_SG_UNIMED</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_LOCALS</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_MARCA</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>_DT_REGISTRO</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QWidget" name="exbir_iniciar" native="true">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>1116</x>
+      <y>20</y>
+      <width>221</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <widget class="QComboBox" name="usuario">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>191</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 75 12pt &quot;Arial&quot;;</string>
+     </property>
+     <item>
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+    </widget>
+    <widget class="QPushButton" name="iniciar">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>120</y>
+       <width>161</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(0, 255, 0);
+font: 75 12pt &quot;Arial&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Iniciar</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="exibir_finalizar" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1116</x>
+      <y>20</y>
+      <width>221</width>
+      <height>190</height>
+     </rect>
+    </property>
+    <widget class="QPushButton" name="cancelar">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>10</y>
+       <width>161</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 0);
+font: 75 12pt &quot;Arial&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Cancelar</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="finalizar">
+     <property name="geometry">
+      <rect>
+       <x>31</x>
+       <y>120</y>
+       <width>161</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 0, 0);
+font: 75 12pt &quot;Arial&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Finalizar</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
