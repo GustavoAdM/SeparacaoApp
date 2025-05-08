@@ -1,6 +1,6 @@
 import configparser
 import logging
-from firebird.driver import driver_config, connect, TPB, Isolation, TraAccessMode, tpb
+from firebird.driver import driver_config, connect, Isolation, TraAccessMode, tpb
 from contextlib import contextmanager
 from queue import Queue, Empty
 from threading import Lock
