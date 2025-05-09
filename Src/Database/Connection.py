@@ -62,7 +62,6 @@ class FirebirdDB:
                 conn.begin(tpb=tpb_bytes)
                 with conn.cursor() as cursor:
                     cursor.execute(query, params or [])
-                    columns = [col[0] for col in cursor.description]
                     results = [tuple(row) for row in cursor.fetchall()]
                 conn.commit()
                 return results

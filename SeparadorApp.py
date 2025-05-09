@@ -23,6 +23,7 @@ class WorkerThread(QThread):
     def run(self):
         """O código que será executado no thread."""
         try:
+
             # Obtém os dados (no seu caso, os pedidos)
             if self.tabela == "P":
                 data = pedidos_nao_separados(empresas=self.empresa)
