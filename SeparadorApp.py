@@ -76,7 +76,7 @@ class MainWindow(QMainWindow):
         self.empresa = None
         self.tipo_tabela = "P"
 
-        # Timer para atualizar a tabela a cada 6 segundos
+        # Timer para atualizar a tabela a cada 5 segundos
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.add_data_to_table)
         self.timer.start(5000)
