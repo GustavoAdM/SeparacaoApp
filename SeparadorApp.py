@@ -103,6 +103,7 @@ class MainWindow(QMainWindow):
             self.pedido = self.ui.ListaPedido.item(row, 3).text()
             self.empresa = self.ui.ListaPedido.item(row, 9).text()
             status_pedido = self.ui.ListaPedido.item(row, 8).text()
+            self.user_separacao = self.ui.ListaPedido.item(row, 6).text()
 
             self.ui.usuario.setCurrentIndex(0)
 
@@ -243,6 +244,7 @@ class MainWindow(QMainWindow):
                 self.info_error(
                     "Selecione um pedido ou ordem de serviço para cancelar.")
                 return
+            
 
             if self.pedido:
                 cancelar(empresa=self.empresa, pedido=self.pedido)

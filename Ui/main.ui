@@ -427,18 +427,18 @@ font: 75 12pt &quot;Arial&quot;;</string>
    <widget class="QWidget" name="exibir_finalizar" native="true">
     <property name="geometry">
      <rect>
-      <x>1116</x>
-      <y>20</y>
+      <x>1120</x>
+      <y>19</y>
       <width>221</width>
-      <height>190</height>
+      <height>191</height>
      </rect>
     </property>
     <widget class="QPushButton" name="cancelar">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>10</y>
-       <width>161</width>
+       <width>171</width>
        <height>61</height>
       </rect>
      </property>
@@ -453,9 +453,9 @@ font: 75 12pt &quot;Arial&quot;;</string>
     <widget class="QPushButton" name="finalizar">
      <property name="geometry">
       <rect>
-       <x>31</x>
+       <x>21</x>
        <y>120</y>
-       <width>161</width>
+       <width>171</width>
        <height>61</height>
       </rect>
      </property>
