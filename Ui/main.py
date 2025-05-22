@@ -34,7 +34,7 @@ class Ui_Separadorapp(object):
             self.ListaPedido.setColumnCount(10)
         
         # Tamanho
-        self.ListaPedido.setColumnWidth(0, 80)
+        self.ListaPedido.setColumnWidth(0, 100)
         self.ListaPedido.setColumnWidth(1, 90)
         self.ListaPedido.setColumnWidth(2, 80)
         self.ListaPedido.setColumnWidth(3, 80)

@@ -9,7 +9,7 @@ def pedidos_nao_separados(empresas: int = 50):
                 COALESCE(ES.STATUS, 'N') STATUS,
                 P.CD_EMPRESA,
                 CASE P.CD_TIPOPEDIDO
-                    WHEN 0 THEN 'MOTOBOY DEDICADO'
+                    WHEN 0 THEN 'MB DEDICADO'
                     WHEN 1 THEN 'BALCÃO'
                     WHEN 2 THEN 'MOTOBOY'
                     WHEN 3 THEN 'DESPACHE'
