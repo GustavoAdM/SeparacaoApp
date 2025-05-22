@@ -9,6 +9,7 @@ def pedidos_nao_separados(empresas: int = 50):
                 COALESCE(ES.STATUS, 'N') STATUS,
                 P.CD_EMPRESA,
                 CASE P.CD_TIPOPEDIDO
+                    WHEN 0 THEN 'MOTOBOY DEDICADO'
                     WHEN 1 THEN 'BALCÃO'
                     WHEN 2 THEN 'MOTOBOY'
                     WHEN 3 THEN 'DESPACHE'
@@ -35,7 +36,7 @@ def pedidos_nao_separados(empresas: int = 50):
                 AND P.ST_PEDIDO NOT IN ('A', 'P', 'C')
                 AND P.CD_TIPOPEDIDO IS NOT NULL
                 AND P.NR_ORDEMSERVICO IS NULL
-            ORDER BY COALESCE(P.CD_TIPOPEDIDO, 4)
+            ORDER BY P.CD_TIPOPEDIDO
         )
         SELECT
             NIVEL, DT_PEDIDO, HR_PEDIDO, NR_PEDIDO, 
