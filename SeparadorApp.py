@@ -67,7 +67,8 @@ class MainWindow(QMainWindow):
         self.ui.finalizar.clicked.connect(self.finalizar)
 
         # Gatilhos de eventos Orçamento
-        self.ui.TW_ordemservico.selectionModel().selectionChanged.connect(self.get_value_orcamento)
+        self.ui.TW_ordemservico.selectionModel(
+        ).selectionChanged.connect(self.get_value_orcamento)
 
         # Variáveis de controle
         self.pedido = None
@@ -118,7 +119,7 @@ class MainWindow(QMainWindow):
     def get_value_orcamento(self, selected, deselected):
         """Atualiza a lista de seleções quando as linhas são selecionadas ou desmarcadas"""
         self.ui.ListaPedido.clearSelection()
-        self.ui.TW_ordemservico.setUpdatesEnabled(True)
+        self.ui.TW_ordemservico.setUpdatesEnabled(False)
         self.pedido = None
         self.tipo_tabela = "O"
 
@@ -162,6 +163,8 @@ class MainWindow(QMainWindow):
             if pedido not in self.ordemservico:
                 self.ordemservico.append(pedido)
                 atualizar_interface(status)
+        self.ui.TW_ordemservico.setUpdatesEnabled(True)
+
 
     def mostrar_iniciar(self):
         """Exibe os elementos para iniciar o processo."""
@@ -173,12 +176,11 @@ class MainWindow(QMainWindow):
         self.ui.exbir_iniciar.hide()
         self.ui.exibir_finalizar.show()
 
-        if self.user_separacao in ["1 (procurando)", "52 (procurando)", "5 (procurando)"]: 
-           self.ui.cancelar.hide()
-        elif self.usuario in ["1 (procurando)", "52 (procurando)", "5 (procurando)"]: 
-           self.ui.cancelar.hide()
+        if self.user_separacao in ["1 (procurando)", "52 (procurando)", "5 (procurando)"]:
+            self.ui.cancelar.hide()
         else:
             self.ui.cancelar.show()
+
 
     def inserir_usuario(self):
         """Popula o campo de usuários com dados da configuração."""
@@ -203,7 +205,7 @@ class MainWindow(QMainWindow):
                 self.info_error(
                     "Campo usuário obrigatório. Por favor, preencha o campo usuário antes de continuar.")
                 return
-            
+
             if not self.pedido and self.tipo_tabela == "P":
                 self.info_error(
                     "Por favor, selecione um pedido ou uma ordem de serviço para continuar.")
@@ -214,7 +216,7 @@ class MainWindow(QMainWindow):
                 return
 
             if self.pedido and self.tipo_tabela == "P":
-    
+
                 inserir_inicio(
                     empresa=self.empresa,
                     pedido=self.pedido,
@@ -252,7 +254,6 @@ class MainWindow(QMainWindow):
                 self.info_error(
                     "Selecione um pedido ou ordem de serviço para cancelar.")
                 return
-            
 
             if self.pedido:
                 cancelar(empresa=self.empresa, pedido=self.pedido)
