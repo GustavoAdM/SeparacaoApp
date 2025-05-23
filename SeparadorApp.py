@@ -172,6 +172,11 @@ class MainWindow(QMainWindow):
         self.ui.exbir_iniciar.hide()
         self.ui.exibir_finalizar.show()
 
+        if self.user_separacao in ["1 (procurando)", "52 (procurando)", "5 (procurando)"]: 
+           self.ui.cancelar.hide()
+        else:
+            self.ui.cancelar.show()
+
     def inserir_usuario(self):
         """Popula o campo de usuários com dados da configuração."""
         try:
@@ -179,7 +184,7 @@ class MainWindow(QMainWindow):
             usuarios_separados = usuarios.split(',')
             for usuario in usuarios_separados:
                 if usuario:
-                    self.ui.usuario.addItem(usuario)
+                    self.ui.usuario.addItem(usuario.strip())
         except Exception as e:
             self.info_error(f"Erro ao inserir usuários: {e}")
 
