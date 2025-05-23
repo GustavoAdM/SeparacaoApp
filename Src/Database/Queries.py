@@ -275,7 +275,7 @@ def orcamentos_separacao(empresas: int = 50):
     IRQ INDEX (IDX001_ITEMREQUISICAOOFICINA))))
 
     )Y
-    ORDER BY Y.NR_ORDEMSERVICO
+    ORDER BY Y.NR_ORDEMSERVICO, Y.CD_ITEM
     """
 
     # A ordem dos parâmetros corresponde à ordem de aparição dos `?` no SQL
