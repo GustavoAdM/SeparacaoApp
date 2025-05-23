@@ -123,7 +123,6 @@ class MainWindow(QMainWindow):
         self.pedido = None
         self.tipo_tabela = "O"
 
-
         def extrair_pedido(row):
             """Extrai as informações da linha como uma tupla de pedido"""
             def get(col): return self.ui.TW_ordemservico.item(row, col).text()
@@ -153,6 +152,7 @@ class MainWindow(QMainWindow):
             pedido = extrair_pedido(row)
             status = pedido[3]
             if pedido in self.ordemservico:
+                self.user_separacao = self.ui.TW_ordemservico.item(row, 6).text()
                 self.ordemservico.remove(pedido)
                 atualizar_interface(status)
 
@@ -161,10 +161,10 @@ class MainWindow(QMainWindow):
             pedido = extrair_pedido(row)
             status = pedido[3]
             if pedido not in self.ordemservico:
+                self.user_separacao = self.ui.TW_ordemservico.item(row, 6).text()
                 self.ordemservico.append(pedido)
                 atualizar_interface(status)
         self.ui.TW_ordemservico.setUpdatesEnabled(True)
-
 
     def mostrar_iniciar(self):
         """Exibe os elementos para iniciar o processo."""
@@ -180,7 +180,6 @@ class MainWindow(QMainWindow):
             self.ui.cancelar.hide()
         else:
             self.ui.cancelar.show()
-
 
     def inserir_usuario(self):
         """Popula o campo de usuários com dados da configuração."""
