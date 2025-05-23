@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
         self.usuario = None
         self.empresa = None
         self.tipo_tabela = "P"
+        self.user_separacao = ""
 
         # Timer para atualizar a tabela a cada 5 segundos
         self.timer = QTimer(self)
@@ -173,6 +174,8 @@ class MainWindow(QMainWindow):
         self.ui.exibir_finalizar.show()
 
         if self.user_separacao in ["1 (procurando)", "52 (procurando)", "5 (procurando)"]: 
+           self.ui.cancelar.hide()
+        elif self.usuario in ["1 (procurando)", "52 (procurando)", "5 (procurando)"]: 
            self.ui.cancelar.hide()
         else:
             self.ui.cancelar.show()
