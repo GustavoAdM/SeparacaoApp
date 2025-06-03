@@ -80,5 +80,21 @@ class FirebirdDB:
             except Exception as e:
                 self.logger.error(f"Erro na operação UDI: {e}")
                 conn.rollback()
+    
+    def close_all(self):
+        """Fecha todas as conexões do pool"""
+        with self.pool_lock:
+            while not self.pool.empty():
+                try:
+                    conn = self.pool.get_nowait()
+                    try:
+                        # Verificação CORRETA do estado da conexão
+                        if hasattr(conn, '_att') and conn._att is not None:
+                            conn.close()
+                    except Exception as e:
+                        self.logger.error(f"Erro ao fechar conexão: {e}")
+                except Empty:
+                    break
+        self.logger.info("Todas as conexões do pool foram fechadas")
 
 db = FirebirdDB()

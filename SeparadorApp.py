@@ -4,7 +4,7 @@ from PySide6.QtCore import QModelIndex, Qt, QTimer, QThread, Signal
 from Ui.main import Ui_Separadorapp
 from Src.Database.Queries import (pedidos_nao_separados, inserir_inicio, cancelar,
                                   finalizar, orcamentos_separacao, inserir_orcamento,
-                                  cancelar_orcamento, finalizar_orcamento)
+                                  cancelar_orcamento, finalizar_orcamento, encerrar_conexao)
 from Src.Layout.RomaneiroSeparacao import RomaneioSeparacao
 from Src.Utils.ElgineLabelPrinter import ElginLabelPrinter
 import datetime
@@ -370,6 +370,18 @@ class MainWindow(QMainWindow):
     ######### IMRESSAO DE ROMANEIO ###########
     """
 
+    def closeEvent(self, event):
+        """Executado quando a janela é fechada"""
+        # Fecha todas as conexões do banco
+        encerrar_conexao()
+        
+        # Aceita o evento de fechamento
+        event.accept()
+
+    def safe_shutdown(self):
+        """Fecha a janela de forma controlada"""
+        self.close()
+
     def gerar_romaneio(self):
         caminho_pedf = self.config["impressao"]["caminho_relatorio"]
         pdf = RomaneioSeparacao(f"{caminho_pedf}\\{self.usuario}")
@@ -390,4 +402,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
+    app.aboutToQuit.connect(window.safe_shutdown)
     sys.exit(app.exec())

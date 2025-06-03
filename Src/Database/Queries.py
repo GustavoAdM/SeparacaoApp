@@ -1,6 +1,10 @@
 from .Connection import db
 
 
+def encerrar_conexao():
+    db.close_all()
+
+
 def pedidos_nao_separados(empresas: int = 50):
     _query = f"""
         WITH PEDIDOS_SEPARACAO AS (
