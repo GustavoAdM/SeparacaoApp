@@ -370,17 +370,6 @@ class MainWindow(QMainWindow):
     ######### IMRESSAO DE ROMANEIO ###########
     """
 
-    def closeEvent(self, event):
-        """Executado quando a janela é fechada"""
-        # Fecha todas as conexões do banco
-        encerrar_conexao()
-        
-        # Aceita o evento de fechamento
-        event.accept()
-
-    def safe_shutdown(self):
-        """Fecha a janela de forma controlada"""
-        self.close()
 
     def gerar_romaneio(self):
         caminho_pedf = self.config["impressao"]["caminho_relatorio"]
@@ -396,6 +385,20 @@ class MainWindow(QMainWindow):
             printer.imprimir_relatorio(nome_arquivo=nome_arquivo)
         except Exception as e:
             print(f"Erro: {e}")
+
+
+    ######## Encerrar processos e conexao DB ########
+    def closeEvent(self, event):
+        """Executado quando a janela é fechada"""
+        # Fecha todas as conexões do banco
+        encerrar_conexao()
+        
+        # Aceita o evento de fechamento
+        event.accept()
+
+    def safe_shutdown(self):
+        """Fecha a janela de forma controlada"""
+        self.close()        
 
 
 if __name__ == "__main__":
