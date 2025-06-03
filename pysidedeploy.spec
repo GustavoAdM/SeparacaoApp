@@ -40,7 +40,7 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Gui,Widgets,Core
+modules = Core,Gui,Widgets
 
 # qt plugins used by the application
 plugins = platforms,imageformats,styles
@@ -64,7 +64,7 @@ plugins =
 macos.permissions = 
 
 # mode of using nuitka. accepts standalone or onefile. default is onefile.
-mode = onefile
+mode = standalone
 
 # (str) specify any extra nuitka arguments
 extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing,test --clang --enable-plugin=pyside6 --show-progress --remove-output
