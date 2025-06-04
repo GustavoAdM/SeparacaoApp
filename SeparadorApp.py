@@ -152,7 +152,8 @@ class MainWindow(QMainWindow):
             pedido = extrair_pedido(row)
             status = pedido[3]
             if pedido in self.ordemservico:
-                self.user_separacao = self.ui.TW_ordemservico.item(row, 6).text()
+                self.user_separacao = self.ui.TW_ordemservico.item(
+                    row, 6).text()
                 self.ordemservico.remove(pedido)
                 atualizar_interface(status)
 
@@ -161,7 +162,8 @@ class MainWindow(QMainWindow):
             pedido = extrair_pedido(row)
             status = pedido[3]
             if pedido not in self.ordemservico:
-                self.user_separacao = self.ui.TW_ordemservico.item(row, 6).text()
+                self.user_separacao = self.ui.TW_ordemservico.item(
+                    row, 6).text()
                 self.ordemservico.append(pedido)
                 atualizar_interface(status)
         self.ui.TW_ordemservico.setUpdatesEnabled(True)
@@ -370,7 +372,6 @@ class MainWindow(QMainWindow):
     ######### IMRESSAO DE ROMANEIO ###########
     """
 
-
     def gerar_romaneio(self):
         caminho_pedf = self.config["impressao"]["caminho_relatorio"]
         pdf = RomaneioSeparacao(f"{caminho_pedf}\\{self.usuario}")
@@ -386,19 +387,19 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"Erro: {e}")
 
-
     ######## Encerrar processos e conexao DB ########
+
     def closeEvent(self, event):
         """Executado quando a janela é fechada"""
         # Fecha todas as conexões do banco
         encerrar_conexao()
-        
+
         # Aceita o evento de fechamento
         event.accept()
 
     def safe_shutdown(self):
         """Fecha a janela de forma controlada"""
-        self.close()        
+        self.close()
 
 
 if __name__ == "__main__":
