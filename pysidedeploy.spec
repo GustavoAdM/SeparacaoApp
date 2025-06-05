@@ -40,7 +40,7 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Core,Gui,Widgets
+modules = Widgets,Gui,Core
 
 # qt plugins used by the application
 plugins = platforms,imageformats,styles
@@ -64,10 +64,10 @@ plugins =
 macos.permissions = 
 
 # mode of using nuitka. accepts standalone or onefile. default is onefile.
-mode = onefile
+mode = standalone
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing,test --clang --enable-plugin=pyside6 --show-progress --remove-output
+extra_args = --quiet --noinclude-qt-translations --windows-console-mode=disable --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing,test --enable-plugin=pyside6 --show-progress --remove-output --noinclude-dlls=*.cpp.o,*.qsb --windows-icon-from-ico=C:\\Users\\Belenzier\\Desktop\\WorkSpace\\Separacao\\clip.ico
 
 [buildozer]
 
