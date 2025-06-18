@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         self.ui.TW_ordemservico.setUpdatesEnabled(False)
         self.pedido = None
         self.tipo_tabela = "O"
-
+ 
         def extrair_pedido(row):
             """Extrai as informações da linha como uma tupla de pedido"""
             def get(col): return self.ui.TW_ordemservico.item(row, col).text()
