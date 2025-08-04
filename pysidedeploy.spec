@@ -5,10 +5,10 @@ title = SeparadorApp
 
 # project directory. the general assumption is that project_dir is the parent directory
 # of input_file
-project_dir = C:\Users\Belenzier\Desktop\WorkSpace\Separacao
+project_dir = C:\Users\Ti Belenzier\Desktop\workspace\SeparacaoApp
 
 # source file path
-input_file = C:\Users\Belenzier\Desktop\WorkSpace\Separacao\SeparadorApp.py
+input_file = C:\Users\Ti Belenzier\Desktop\workspace\SeparacaoApp\SeparadorApp.py
 
 # directory where exec is stored
 exec_directory = .
@@ -22,7 +22,7 @@ icon = clip.ico
 [python]
 
 # python path
-python_path = C:\Users\Belenzier\Desktop\WorkSpace\Separacao\Core\Scripts\python.exe
+python_path = C:\Users\Ti Belenzier\Desktop\workspace\SeparacaoApp\.env\Scripts\python.exe
 
 # python packages to install
 packages = Nuitka==2.4.8
@@ -40,7 +40,7 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Widgets,Gui,Core
+modules = Gui,Widgets,Core
 
 # qt plugins used by the application
 plugins = platforms,imageformats,styles
@@ -67,7 +67,12 @@ macos.permissions =
 mode = standalone
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --windows-console-mode=disable --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing,test --enable-plugin=pyside6 --show-progress --remove-output --noinclude-dlls=*.cpp.o,*.qsb --windows-icon-from-ico=C:\\Users\\Belenzier\\Desktop\\WorkSpace\\Separacao\\clip.ico
+extra_args = --quiet --noinclude-qt-translations
+--windows-console-mode = disable
+--nofollow-import-to = unittest,tkinter,pytest,sqlalchemy.testing,test
+--enable-plugin = pyside6 --show-progress --remove-output
+--noinclude-dlls = *.cpp.o,*.qsb
+--windows-icon-from-ico = clip.ico
 
 [buildozer]
 

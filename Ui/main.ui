@@ -3,26 +3,26 @@
  <class>Separadorapp</class>
  <widget class="QMainWindow" name="Separadorapp">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1350</width>
-    <height>750</height>
+    <width>1200</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1350</width>
-    <height>750</height>
+    <width>1200</width>
+    <height>650</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1350</width>
-    <height>750</height>
+    <width>1200</width>
+    <height>650</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -32,20 +32,20 @@
    <widget class="QTableWidget" name="ListaPedido">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>4</x>
       <y>10</y>
-      <width>1091</width>
-      <height>341</height>
+      <width>1041</width>
+      <height>291</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">font: 75 10pt &quot;Arial&quot;;</string>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::SingleSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
     </property>
     <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
+     <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
     </property>
     <column>
      <property name="text">
@@ -69,9 +69,6 @@
        <pointsize>10</pointsize>
       </font>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
@@ -82,9 +79,6 @@
        <pointsize>10</pointsize>
       </font>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
@@ -94,9 +88,6 @@
       <font>
        <pointsize>10</pointsize>
       </font>
-     </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
      </property>
     </column>
     <column>
@@ -154,77 +145,20 @@
    <widget class="QLineEdit" name="infos">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>696</y>
-      <width>911</width>
+      <x>6</x>
+      <y>577</y>
+      <width>1060</width>
       <height>41</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>370</y>
-      <width>171</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Alto - Balcão</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>420</y>
-      <width>171</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Medio - MotoBoy</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>470</y>
-      <width>171</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 75 12pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Baixo - Despache</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="Empresa">
     <property name="geometry">
      <rect>
-      <x>1222</x>
-      <y>694</y>
-      <width>91</width>
-      <height>42</height>
+      <x>1190</x>
+      <y>580</y>
+      <width>41</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -240,17 +174,17 @@
    <widget class="QTableWidget" name="TW_ordemservico">
     <property name="geometry">
      <rect>
-      <x>11</x>
-      <y>370</y>
-      <width>1091</width>
-      <height>310</height>
+      <x>5</x>
+      <y>308</y>
+      <width>1041</width>
+      <height>261</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">font: 75 10pt &quot;Arial&quot;;</string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+     <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
     </property>
     <property name="dragEnabled">
      <bool>false</bool>
@@ -259,17 +193,14 @@
      <bool>false</bool>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::MultiSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
     </property>
     <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
+     <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
     </property>
     <column>
      <property name="text">
       <string>OS</string>
-     </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
      </property>
     </column>
     <column>
@@ -308,16 +239,10 @@
      <property name="text">
       <string>Qtde</string>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
       <string>Separador</string>
-     </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
      </property>
     </column>
     <column>
@@ -382,18 +307,18 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1116</x>
-      <y>20</y>
-      <width>221</width>
-      <height>191</height>
+      <x>1050</x>
+      <y>19</y>
+      <width>140</width>
+      <height>150</height>
      </rect>
     </property>
     <widget class="QComboBox" name="usuario">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>0</x>
        <y>10</y>
-       <width>191</width>
+       <width>140</width>
        <height>61</height>
       </rect>
      </property>
@@ -409,10 +334,10 @@
     <widget class="QPushButton" name="iniciar">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>120</y>
-       <width>161</width>
-       <height>61</height>
+       <x>15</x>
+       <y>85</y>
+       <width>110</width>
+       <height>60</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -427,19 +352,22 @@ font: 75 12pt &quot;Arial&quot;;</string>
    <widget class="QWidget" name="exibir_finalizar" native="true">
     <property name="geometry">
      <rect>
-      <x>1120</x>
+      <x>1050</x>
       <y>19</y>
-      <width>221</width>
-      <height>191</height>
+      <width>140</width>
+      <height>150</height>
      </rect>
     </property>
     <widget class="QPushButton" name="cancelar">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>15</x>
        <y>10</y>
-       <width>171</width>
-       <height>61</height>
+       <width>110</width>
+       <height>60</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -451,12 +379,15 @@ font: 75 12pt &quot;Arial&quot;;</string>
      </property>
     </widget>
     <widget class="QPushButton" name="finalizar">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
-       <x>21</x>
-       <y>120</y>
-       <width>171</width>
-       <height>61</height>
+       <x>15</x>
+       <y>85</y>
+       <width>110</width>
+       <height>60</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -476,10 +407,7 @@ font: 75 12pt &quot;Arial&quot;;</string>
   <tabstop>iniciar</tabstop>
   <tabstop>cancelar</tabstop>
   <tabstop>finalizar</tabstop>
-  <tabstop>lineEdit_2</tabstop>
-  <tabstop>lineEdit</tabstop>
   <tabstop>Empresa</tabstop>
-  <tabstop>lineEdit_3</tabstop>
   <tabstop>infos</tabstop>
  </tabstops>
  <resources/>

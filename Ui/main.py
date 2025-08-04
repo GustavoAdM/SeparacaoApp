@@ -11,9 +11,8 @@
 from PySide6.QtCore import (QCoreApplication, 
     QMetaObject, QRect,
     QSize, Qt)
-from PySide6.QtGui import (
-    QFont)
-from PySide6.QtWidgets import (QAbstractItemView, QComboBox, 
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (QAbstractItemView, QComboBox,
     QLineEdit, QPushButton, 
     QTableWidget, QTableWidgetItem, QWidget)
 
@@ -21,10 +20,10 @@ class Ui_Separadorapp(object):
     def setupUi(self, Separadorapp):
         if not Separadorapp.objectName():
             Separadorapp.setObjectName(u"Separadorapp")
-        Separadorapp.setWindowModality(Qt.NonModal)
-        Separadorapp.resize(1350, 750)
-        Separadorapp.setMinimumSize(QSize(1350, 750))
-        Separadorapp.setMaximumSize(QSize(1350, 750))
+        Separadorapp.setWindowModality(Qt.WindowModality.NonModal)
+        Separadorapp.resize(1200, 650)
+        Separadorapp.setMinimumSize(QSize(1200, 650))
+        Separadorapp.setMaximumSize(QSize(1200, 650))
         self.centralwidget = QWidget(Separadorapp)
         self.centralwidget.setObjectName(u"centralwidget")
         self.ListaPedido = QTableWidget(self.centralwidget)
@@ -47,22 +46,18 @@ class Ui_Separadorapp(object):
             self.ListaPedido.setColumnHidden(col, True)
 
         font = QFont()
-        font.setPointSize(8)
-
+        font.setPointSize(10)
         __qtablewidgetitem = QTableWidgetItem()
         __qtablewidgetitem.setTextAlignment(Qt.AlignLeading|Qt.AlignVCenter);
         __qtablewidgetitem.setFont(font);
         self.ListaPedido.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
-        __qtablewidgetitem1.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem1.setFont(font);
         self.ListaPedido.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem2.setFont(font);
         self.ListaPedido.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem3.setFont(font);
         self.ListaPedido.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
@@ -83,31 +78,16 @@ class Ui_Separadorapp(object):
         __qtablewidgetitem9 = QTableWidgetItem()
         self.ListaPedido.setHorizontalHeaderItem(9, __qtablewidgetitem9)
         self.ListaPedido.setObjectName(u"ListaPedido")
-        self.ListaPedido.setGeometry(QRect(10, 10, 1091, 341))
+        self.ListaPedido.setGeometry(QRect(4, 10, 1041, 291))
         self.ListaPedido.setStyleSheet(u"font: 75 10pt \"Arial\";")
-        self.ListaPedido.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ListaPedido.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.ListaPedido.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.ListaPedido.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.infos = QLineEdit(self.centralwidget)
         self.infos.setObjectName(u"infos")
-        self.infos.setGeometry(QRect(20, 696, 911, 41))
-        self.lineEdit = QLineEdit(self.centralwidget)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setGeometry(QRect(1130, 370, 171, 41))
-        self.lineEdit.setStyleSheet(u"font: 75 12pt \"Arial\";")
-        self.lineEdit.setReadOnly(True)
-        self.lineEdit_2 = QLineEdit(self.centralwidget)
-        self.lineEdit_2.setObjectName(u"lineEdit_2")
-        self.lineEdit_2.setGeometry(QRect(1130, 420, 171, 41))
-        self.lineEdit_2.setStyleSheet(u"font: 75 12pt \"Arial\";")
-        self.lineEdit_2.setReadOnly(True)
-        self.lineEdit_3 = QLineEdit(self.centralwidget)
-        self.lineEdit_3.setObjectName(u"lineEdit_3")
-        self.lineEdit_3.setGeometry(QRect(1130, 470, 171, 41))
-        self.lineEdit_3.setStyleSheet(u"font: 75 12pt \"Arial\";")
-        self.lineEdit_3.setReadOnly(True)
+        self.infos.setGeometry(QRect(6, 577, 1060, 41))
         self.Empresa = QLineEdit(self.centralwidget)
         self.Empresa.setObjectName(u"Empresa")
-        self.Empresa.setGeometry(QRect(1222, 694, 91, 42))
+        self.Empresa.setGeometry(QRect(1150, 580, 40, 40))
         self.Empresa.setStyleSheet(u"font: 75 10pt \"Arial\";")
         self.Empresa.setReadOnly(True)
         self.TW_ordemservico = QTableWidget(self.centralwidget)
@@ -116,10 +96,10 @@ class Ui_Separadorapp(object):
         
         # Tamanho
         self.TW_ordemservico.setColumnWidth(0, 65)
-        self.TW_ordemservico.setColumnWidth(1, 270)
+        self.TW_ordemservico.setColumnWidth(1, 250)
         self.TW_ordemservico.setColumnWidth(2, 150)
         self.TW_ordemservico.setColumnWidth(3, 145)
-        self.TW_ordemservico.setColumnWidth(4, 295)
+        self.TW_ordemservico.setColumnWidth(4, 260)
         self.TW_ordemservico.setColumnWidth(5, 50)
 
         # Index Invisiveis
@@ -128,9 +108,8 @@ class Ui_Separadorapp(object):
         # Ocultar colunas de índice 6 em diante
         for col in range(7, self.TW_ordemservico.columnCount()):
             self.TW_ordemservico.setColumnHidden(col, True)
-            
+
         __qtablewidgetitem10 = QTableWidgetItem()
-        __qtablewidgetitem10.setTextAlignment(Qt.AlignCenter);
         self.TW_ordemservico.setHorizontalHeaderItem(0, __qtablewidgetitem10)
         __qtablewidgetitem11 = QTableWidgetItem()
         __qtablewidgetitem11.setTextAlignment(Qt.AlignLeading|Qt.AlignVCenter);
@@ -145,10 +124,8 @@ class Ui_Separadorapp(object):
         __qtablewidgetitem14.setTextAlignment(Qt.AlignLeading|Qt.AlignVCenter);
         self.TW_ordemservico.setHorizontalHeaderItem(4, __qtablewidgetitem14)
         __qtablewidgetitem15 = QTableWidgetItem()
-        __qtablewidgetitem15.setTextAlignment(Qt.AlignCenter);
         self.TW_ordemservico.setHorizontalHeaderItem(5, __qtablewidgetitem15)
         __qtablewidgetitem16 = QTableWidgetItem()
-        __qtablewidgetitem16.setTextAlignment(Qt.AlignCenter);
         self.TW_ordemservico.setHorizontalHeaderItem(6, __qtablewidgetitem16)
         __qtablewidgetitem17 = QTableWidgetItem()
         self.TW_ordemservico.setHorizontalHeaderItem(7, __qtablewidgetitem17)
@@ -173,38 +150,40 @@ class Ui_Separadorapp(object):
         __qtablewidgetitem27 = QTableWidgetItem()
         self.TW_ordemservico.setHorizontalHeaderItem(17, __qtablewidgetitem27)
         self.TW_ordemservico.setObjectName(u"TW_ordemservico")
-        self.TW_ordemservico.setGeometry(QRect(11, 370, 1091, 310))
+        self.TW_ordemservico.setGeometry(QRect(5, 308, 1041, 261))
         self.TW_ordemservico.setStyleSheet(u"font: 75 10pt \"Arial\";")
-        self.TW_ordemservico.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
+        self.TW_ordemservico.setEditTriggers(QAbstractItemView.EditTrigger.AnyKeyPressed|QAbstractItemView.EditTrigger.DoubleClicked|QAbstractItemView.EditTrigger.EditKeyPressed|QAbstractItemView.EditTrigger.SelectedClicked)
         self.TW_ordemservico.setDragEnabled(False)
         self.TW_ordemservico.setAlternatingRowColors(False)
-        self.TW_ordemservico.setSelectionMode(QAbstractItemView.MultiSelection)
-        self.TW_ordemservico.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.TW_ordemservico.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        self.TW_ordemservico.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.exbir_iniciar = QWidget(self.centralwidget)
         self.exbir_iniciar.setObjectName(u"exbir_iniciar")
         self.exbir_iniciar.setEnabled(True)
-        self.exbir_iniciar.setGeometry(QRect(1116, 20, 221, 191))
+        self.exbir_iniciar.setGeometry(QRect(1050, 19, 140, 150))
         self.usuario = QComboBox(self.exbir_iniciar)
         self.usuario.addItem("")
         self.usuario.setObjectName(u"usuario")
-        self.usuario.setGeometry(QRect(20, 10, 191, 61))
+        self.usuario.setGeometry(QRect(0, 10, 140, 61))
         self.usuario.setStyleSheet(u"font: 75 12pt \"Arial\";")
         self.iniciar = QPushButton(self.exbir_iniciar)
         self.iniciar.setObjectName(u"iniciar")
-        self.iniciar.setGeometry(QRect(30, 120, 161, 61))
+        self.iniciar.setGeometry(QRect(15, 85, 110, 60))
         self.iniciar.setStyleSheet(u"background-color: rgb(0, 255, 0);\n"
 "font: 75 12pt \"Arial\";")
         self.exibir_finalizar = QWidget(self.centralwidget)
         self.exibir_finalizar.setObjectName(u"exibir_finalizar")
-        self.exibir_finalizar.setGeometry(QRect(1116, 20, 221, 190))
+        self.exibir_finalizar.setGeometry(QRect(1050, 19, 140, 150))
         self.cancelar = QPushButton(self.exibir_finalizar)
         self.cancelar.setObjectName(u"cancelar")
-        self.cancelar.setGeometry(QRect(30, 10, 161, 61))
+        self.cancelar.setEnabled(True)
+        self.cancelar.setGeometry(QRect(15, 10, 110, 60))
         self.cancelar.setStyleSheet(u"background-color: rgb(255, 255, 0);\n"
 "font: 75 12pt \"Arial\";")
         self.finalizar = QPushButton(self.exibir_finalizar)
         self.finalizar.setObjectName(u"finalizar")
-        self.finalizar.setGeometry(QRect(31, 120, 161, 61))
+        self.finalizar.setEnabled(True)
+        self.finalizar.setGeometry(QRect(15, 85, 110, 60))
         self.finalizar.setStyleSheet(u"background-color: rgb(255, 0, 0);\n"
 "font: 75 12pt \"Arial\";")
         Separadorapp.setCentralWidget(self.centralwidget)
@@ -212,11 +191,8 @@ class Ui_Separadorapp(object):
         QWidget.setTabOrder(self.usuario, self.iniciar)
         QWidget.setTabOrder(self.iniciar, self.cancelar)
         QWidget.setTabOrder(self.cancelar, self.finalizar)
-        QWidget.setTabOrder(self.finalizar, self.lineEdit_2)
-        QWidget.setTabOrder(self.lineEdit_2, self.lineEdit)
-        QWidget.setTabOrder(self.lineEdit, self.Empresa)
-        QWidget.setTabOrder(self.Empresa, self.lineEdit_3)
-        QWidget.setTabOrder(self.lineEdit_3, self.infos)
+        QWidget.setTabOrder(self.finalizar, self.Empresa)
+        QWidget.setTabOrder(self.Empresa, self.infos)
 
         self.retranslateUi(Separadorapp)
 
@@ -245,9 +221,6 @@ class Ui_Separadorapp(object):
         ___qtablewidgetitem8.setText(QCoreApplication.translate("Separadorapp", u"_STATUS", None));
         ___qtablewidgetitem9 = self.ListaPedido.horizontalHeaderItem(9)
         ___qtablewidgetitem9.setText(QCoreApplication.translate("Separadorapp", u"_CD_EMPRESA", None));
-        self.lineEdit.setText(QCoreApplication.translate("Separadorapp", u"Alto - Balc\u00e3o", None))
-        self.lineEdit_2.setText(QCoreApplication.translate("Separadorapp", u"Medio - MotoBoy", None))
-        self.lineEdit_3.setText(QCoreApplication.translate("Separadorapp", u"Baixo - Despache", None))
         self.Empresa.setText("")
         ___qtablewidgetitem10 = self.TW_ordemservico.horizontalHeaderItem(0)
         ___qtablewidgetitem10.setText(QCoreApplication.translate("Separadorapp", u"OS", None));
