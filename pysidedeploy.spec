@@ -17,7 +17,7 @@ exec_directory = .
 project_file = 
 
 # application icon
-icon = clip.ico
+icon = C:\\Users\\Ti Belenzier\\Desktop\\workspace\\SeparacaoApp\\clip.ico
 
 [python]
 
@@ -40,7 +40,7 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Gui,Widgets,Core
+modules = Core,Gui,Widgets
 
 # qt plugins used by the application
 plugins = platforms,imageformats,styles
@@ -64,15 +64,10 @@ plugins =
 macos.permissions = 
 
 # mode of using nuitka. accepts standalone or onefile. default is onefile.
-mode = standalone
+mode = onefile
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations
---windows-console-mode = disable
---nofollow-import-to = unittest,tkinter,pytest,sqlalchemy.testing,test
---enable-plugin = pyside6 --show-progress --remove-output
---noinclude-dlls = *.cpp.o,*.qsb
---windows-icon-from-ico = clip.ico
+extra_args = --quiet --noinclude-qt-translations --windows-console-mode=disable --nofollow-import-to=unittest,tkinter,pytest,sqlalchemy.testing,test --enable-plugin=pyside6 --show-progress --remove-output --noinclude-dlls=*.cpp.o,*.qsb --windows-icon-from-ico="C:\\Users\\Ti Belenzier\\Desktop\\workspace\\SeparacaoApp\\clip.ico"
 
 [buildozer]
 
