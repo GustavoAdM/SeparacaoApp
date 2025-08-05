@@ -2,9 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 from PySide6.QtCore import QModelIndex, Qt, QTimer, QThread, Signal
 from Ui.main import Ui_Separadorapp
-from Src.Database.Queries import (pedidos_nao_separados, inserir_inicio, cancelar,
-                                  finalizar, orcamentos_separacao, inserir_orcamento,
-                                  cancelar_orcamento, finalizar_orcamento, encerrar_conexao)
+from Src.Database.Queries import *
 from Src.Layout.RomaneiroSeparacao import RomaneioSeparacao
 from Src.Utils.ElgineLabelPrinter import ElginLabelPrinter
 import datetime
