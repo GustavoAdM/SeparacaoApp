@@ -26,7 +26,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>SearacaoApp</string>
+   <string>SeparadorApp</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="QIcon::ThemeIcon::AddressBookNew"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableWidget" name="ListaPedido">
@@ -147,7 +150,7 @@
      <rect>
       <x>6</x>
       <y>577</y>
-      <width>1060</width>
+      <width>1041</width>
       <height>41</height>
      </rect>
     </property>
@@ -155,7 +158,7 @@
    <widget class="QLineEdit" name="Empresa">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1140</x>
       <y>580</y>
       <width>41</width>
       <height>41</height>
@@ -307,7 +310,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1050</x>
+      <x>1051</x>
       <y>19</y>
       <width>140</width>
       <height>150</height>
@@ -352,7 +355,7 @@ font: 75 12pt &quot;Arial&quot;;</string>
    <widget class="QWidget" name="exibir_finalizar" native="true">
     <property name="geometry">
      <rect>
-      <x>1050</x>
+      <x>1051</x>
       <y>19</y>
       <width>140</width>
       <height>150</height>
